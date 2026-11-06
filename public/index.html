@@ -719,6 +719,7 @@ function wireReplica(){
   $$('.replica-sheet',book).forEach(function(sheet){
     var key=sheet.getAttribute('data-ed');var els=$$('h3,li',sheet);
     var saved=(S.ed||{})[key]||[];
+    if(!A.isAdmin)return;
     els.forEach(function(el,i){if(typeof saved[i]==='string')el.innerHTML=saved[i];el.setAttribute('contenteditable','true');el.setAttribute('spellcheck','false');el.setAttribute('data-i',i);
       el.addEventListener('input',function(){var arr=(S.ed[key]||(S.ed[key]=[]));arr[i]=el.innerHTML;save();});});
   });
@@ -756,7 +757,7 @@ function lessonHtml(t){
   var h='<div class="sheet">';
   h+='<div class="page-head"><span class="kicker">'+esc(D.stages.filter(function(s){return s.id===t.stage;})[0].title)+'</span><h1>'+esc(t.title)+'</h1><p>'+esc(t.goal)+'</p>'+domPills(t)+'</div>';
   h+=tabsHtml();
-  if(t.id==='network-basics'&&S.layout==='notebook'){h+='<p class="muted">Tap any line on the notebook pages below to edit it. Changes save automatically.</p><button class="btn small" data-act="reset-replica">Restore original wording</button></div>'+replica()+'<div class="sheet" style="margin-top:22px">';}
+  if(t.id==='network-basics'&&S.layout==='notebook'){h+=(A.isAdmin?'<p class="muted">Admin: tap any line on the notebook pages below to edit it. Changes save automatically.</p><button class="btn small" data-act="reset-replica">Restore original wording</button>':'')+'</div>'+replica()+'<div class="sheet" style="margin-top:22px">';}
   if(t.prerequisites.length)h+='<h3>Before this topic</h3><p>'+t.prerequisites.map(function(p){return '<a href="#t-'+esc(p)+'" data-link="1">'+esc(TB[p]?TB[p].title:p)+'</a>';}).join(' · ')+'</p>';
   h+='<h2>What to learn</h2>'+list(t.learn);
   var sc=SCENES[t.id];if(sc)h+='<h2>Picture it</h2><div class="scene-grid">'+sc.map(scene).join('')+'</div>';
@@ -1030,7 +1031,7 @@ document.addEventListener('click',function(e){
   if(act==='tab'){V.tab=el.getAttribute('data-tab');V.quiz=null;render();window.scrollTo({top:0});return;}
   if(act==='cp'){S.cp[tid]=+el.getAttribute('data-i');save();render();return;}
   if(act==='cp-reset'){delete S.cp[tid];save();render();return;}
-  if(act==='reset-replica'){S.ed={};save();render();return;}
+  if(act==='reset-replica'){if(!A.isAdmin)return;S.ed={};save();render();return;}
   if(act==='lab-done'){if(!labReady(tid))return;(S.labs[tid]||(S.labs[tid]={steps:{}})).done=true;save();render();toast('Lab marked complete');return;}
   if(act==='lab-undo'){S.labs[tid].done=false;save();render();return;}
   if(act==='start'){var df=el.getAttribute('data-diff');startQuiz(D.quiz[tid][df],{tid:tid,diff:df,mode:df==='Easy'?'easy':'test',label:TB[tid].title+' · '+df});return;}
