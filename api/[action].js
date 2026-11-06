@@ -12,6 +12,12 @@ module.exports=async(req,res)=>{
     else if(a==='changepw'&&req.method==='POST')out=await core.changepw(req);
     else if(a==='forgot'&&req.method==='POST')out=await core.forgot(req);
     else if(a==='reset'&&req.method==='POST')out=await core.reset(req);
+    else if(a==='mycode'&&req.method==='POST')out=await core.mycode(req);
+    else if(a==='verifycode'&&req.method==='POST')out=await core.verifycode(req);
+    else if(a==='admin_unlock'&&req.method==='POST')out=await core.adminUnlock(req);
+    else if(a==='admin_newcode'&&req.method==='POST')out=await core.adminNewCode(req);
+    else if(a==='cron'&&req.method==='GET')out=await core.cron(req);
+    else if(a==='backup'&&req.method==='GET')out=await core.backup(req);
     else if(a==='admin_users'&&req.method==='POST')out=await core.adminUsers(req);
     else if(a==='admin_reset_link'&&req.method==='POST')out=await core.adminResetLink(req);
     else if(a==='admin_otp'&&req.method==='POST')out=await core.adminOtp(req);

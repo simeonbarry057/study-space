@@ -1,1 +1,1 @@
-{"outputDirectory":"public","cleanUrls":true}
+{"outputDirectory":"public","cleanUrls":true,"crons":[{"path":"/api/cron","schedule":"0 13 * * *"}]}

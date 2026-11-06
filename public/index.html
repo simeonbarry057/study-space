@@ -519,6 +519,15 @@ body.reading .topbar,body.reading .rail,body.reading .scrim,body.reading .admin-
 body.reading .shell{grid-template-columns:minmax(0,1fr)!important;padding-block:12px 40px}
 body.reading .main{max-width:1100px;margin-inline:auto;width:100%}
 
+/* security code popup */
+.code-big{display:flex;gap:10px;justify-content:center;margin:12px 0 14px}
+.code-big i{font-style:normal;display:grid;place-items:center;width:clamp(44px,12vw,62px);height:clamp(58px,15vw,78px);border-radius:14px;font:900 clamp(2rem,8vw,3rem)/1 system-ui,sans-serif;color:#fff0f3;
+ background:linear-gradient(180deg,#5b0d23,#2b0511);border:2px solid #ff4766;box-shadow:0 4px 0 #b3122f,0 8px 14px #000a,inset 0 2px 0 #ffb3c1aa;text-shadow:1px 1px 0 #ff1f4b,2px 2px 0 #d10f33,3px 3px 0 #8c0f27}
+.cm-check{display:flex;gap:10px;align-items:center;justify-content:center;margin:4px 0 16px;color:#ffd5dc;font-weight:800;cursor:pointer}
+.cm-check input{width:20px;height:20px;accent-color:#ff4766}
+.lm-btns .cta[disabled]{opacity:.45;cursor:not-allowed;filter:grayscale(.5)}
+.code-input{letter-spacing:.5em;text-align:center;font-size:1.6rem;font-weight:800}
+
 
 body{margin:0}
 .authtabs{display:flex;gap:8px;margin:0 0 6px}
@@ -557,8 +566,9 @@ body{margin:0}
 <script>
 (function(){
  var ME={id:null};
- var RT=null;try{RT=new URLSearchParams(location.search).get('reset');}catch(e){}
- var ready=fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json();}).catch(function(){return {id:null};}).then(function(m){ME=m||{id:null};if(RT)ME={id:null};});
+ var RT=null,RC=null;try{var qs=new URLSearchParams(location.search);RT=qs.get('reset');RC=qs.get('code');}catch(e){}
+ var ADMIN_CONTACT_WEB='';var blankC=function(){return ADMIN_CONTACT_WEB?'<strong>'+ADMIN_CONTACT_WEB+'</strong>':'<span class="blank" aria-label="to be added">&nbsp;</span>';};
+ var ready=fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json();}).catch(function(){return {id:null};}).then(function(m){ME=m||{id:null};if(RT||RC)ME={id:null};});
  window.__boot=ready.then(function(){window.__content={};if(!ME.id||ME.mustChange)return;return fetch('/api/content',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(c){window.__content=c||{};}).catch(function(){});});
  function call(o){return fetch('/api/db',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-ss':'1'},body:JSON.stringify(o)}).then(function(r){return r.json().then(function(j){return {status:r.status,j:j};},function(){return {status:r.status,j:{}};});});}
  function snapDoc(p,r){return {id:p.split('/').pop(),exists:!!r.exists,data:function(){return r.data;}};}
@@ -580,14 +590,24 @@ body{margin:0}
  window.__api=api;
  window.__authBox=function(){
   var f=function(id,label,type,extra){return '<label for="'+id+'">'+label+'</label><input type="'+(type||'text')+'" id="'+id+'" name="'+id.split('-')[1]+'" '+(extra||'')+'>';};
+  if(RC)return '<h2>Enter your security code</h2><div id="vc-wrap"><p>Type the 5-digit security code you wrote down when you signed up.</p><form data-web-form="vc" novalidate><label for="vc-code">Security code (5 digits)</label><input type="text" id="vc-code" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="5" autocomplete="one-time-code" class="code-input" required><button type="submit" class="cta">Continue <span aria-hidden="true">›</span></button></form></div><p id="web-err" class="auth-err" role="alert"></p>';
   if(RT)return '<h2>Choose a new password</h2><form data-web-form="reset" novalidate>'+f('rs-password','New password (8+ characters)','password','autocomplete="new-password" required')+f('rs-confirm','Type it again','password','autocomplete="new-password" required')+'<button type="submit" class="cta">Save password <span aria-hidden="true">›</span></button></form><p id="web-err" class="auth-err" role="alert"></p>';
   if(ME&&ME.id&&ME.mustChange)return '<h2>Choose your own password</h2><p>You signed in with a one-time password. Pick a new password to continue.</p><form data-web-form="chg" novalidate>'+f('ch-password','New password (8+ characters)','password','autocomplete="new-password" required')+f('ch-confirm','Type it again','password','autocomplete="new-password" required')+'<button type="submit" class="cta">Save password <span aria-hidden="true">›</span></button></form><p id="web-err" class="auth-err" role="alert"></p>';
   return '<h2>Sign up or sign in</h2><div class="authtabs" role="group" aria-label="Sign up or sign in"><button type="button" class="pill-btn" data-web="tab" data-t="up" aria-pressed="true">Sign up</button><button type="button" class="pill-btn" data-web="tab" data-t="in" aria-pressed="false">Sign in</button></div>'
    +'<form id="web-up" data-web-form="up" novalidate><div class="row2"><div>'+f('su-name','Your name','text','maxlength="60" autocomplete="name" required')+'</div><div>'+f('su-email','Email','text','inputmode="email" autocomplete="email" required')+'</div></div>'+f('su-password','Password (8+ characters)','password','autocomplete="new-password" required')+'<details class="owner-code"><summary>Site owner?</summary>'+f('su-setup','Owner setup code','password','autocomplete="off"')+'</details><button type="submit" class="cta">Sign up free <span aria-hidden="true">›</span></button></form>'
    +'<form id="web-in" data-web-form="in" hidden novalidate>'+f('si-email','Email','text','inputmode="email" autocomplete="email" required')+f('si-password','Password or one-time password','password','autocomplete="current-password" required')+'<button type="submit" class="cta">Sign in <span aria-hidden="true">›</span></button><p class="small"><a href="#" data-web="tab" data-t="fg">Forgot your password?</a></p></form>'
-   +'<form id="web-fg" data-web-form="fg" hidden novalidate><p>Enter your email. The site owner is told, and sends you a reset link or a one-time password.</p>'+f('fg-email','Email','text','inputmode="email" autocomplete="email" required')+'<button type="submit" class="cta">Ask for a reset <span aria-hidden="true">›</span></button><p class="small"><a href="#" data-web="tab" data-t="in">Back to sign in</a></p></form>'
+   +'<form id="web-fg" data-web-form="fg" hidden novalidate><p>Enter your email. We will email you a link. You will need the 5-digit security code you wrote down when you signed up.</p>'+f('fg-email','Email','text','inputmode="email" autocomplete="email" required')+'<button type="submit" class="cta">Email me a reset link <span aria-hidden="true">›</span></button><p class="small"><a href="#" data-web="tab" data-t="in">Back to sign in</a></p></form>'
    +'<p id="web-err" class="auth-err" role="alert"></p><p class="muted small">No Claude account needed. Your first lesson is free when you sign up.</p>';
  };
+ function lockedMsg(er){er.style.color='';er.innerHTML='<strong>This account is locked.</strong> Too many wrong security codes. Please reach out to the administrator by email or WhatsApp to unlock it: '+blankC()+'.';}
+ function resetFormHtml(){var f=function(id,label,name){return '<label for="'+id+'">'+label+'</label><input type="password" id="'+id+'" name="'+name+'" autocomplete="new-password" required>';};
+  return '<p>Code accepted. Choose your new password.</p><form data-web-form="reset" novalidate>'+f('rs-password','New password (8+ characters)','password')+f('rs-confirm','Type it again','confirm')+'<button type="submit" class="cta">Save password <span aria-hidden="true">›</span></button></form>';}
+ function showCode(code,go){
+  var m=document.createElement('div');m.className='lock-modal';m.id='code-modal';
+  m.innerHTML='<div class="lm-card" role="dialog" aria-modal="true" aria-labelledby="cm-h"><span class="fn-badge">IMPORTANT</span><h2 id="cm-h">Write down your security code</h2><div class="code-big" aria-label="Your security code">'+String(code).split('').map(function(d){return '<i>'+d+'</i>';}).join('')+'</div><p class="lm-sub">You will need this 5-digit code if you ever forget your password. <b>We cannot show it again.</b> Write it on paper or save it somewhere safe.</p><label class="cm-check"><input type="checkbox" id="cm-ok"> I have written down my security code</label><div class="lm-btns"><button type="button" class="btn" id="cm-copy">Copy code</button><button type="button" class="cta" id="cm-go" disabled>Continue <span aria-hidden="true">›</span></button></div></div>';
+  document.body.appendChild(m);var ok=m.querySelector('#cm-ok'),go2=m.querySelector('#cm-go');
+  ok.addEventListener('change',function(){go2.disabled=!ok.checked;});go2.addEventListener('click',function(){if(ok.checked){m.remove();go();}});
+  m.querySelector('#cm-copy').addEventListener('click',function(){try{navigator.clipboard.writeText(String(code));this.textContent='Copied';}catch(x){}});ok.focus();}
  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-web="tab"]');if(!b)return;e.preventDefault();var t=b.getAttribute('data-t');
   document.querySelectorAll('button[data-web="tab"]').forEach(function(x){x.setAttribute('aria-pressed',String((x.getAttribute('data-t')===t)||(t==='fg'&&x.getAttribute('data-t')==='in')));});
   var m={up:'web-up','in':'web-in',fg:'web-fg'};Object.keys(m).forEach(function(k){var el=document.getElementById(m[k]);if(el)el.hidden=(k!==t);});var er=document.getElementById('web-err');if(er)er.textContent='';});
@@ -599,9 +619,10 @@ body{margin:0}
   var p;
   if(kind==='up')p=api('signup',{name:v('name'),email:v('email'),password:v('password'),setup:v('setup')});
   else if(kind==='in')p=api('login',{email:v('email'),password:v('password')});
-  else if(kind==='fg')p=api('forgot',{email:v('email')}).then(function(j){if(j.__ok){er.style.color='#1b6b3a';er.textContent='Done. If that email has an account, the owner has been told and will send you a reset link or a one-time password.';btn.disabled=false;return null;}return j;});
-  else{if(v('password')!==v('confirm')){fail('The two passwords do not match.');return;}p=kind==='reset'?api('reset',{token:RT,password:v('password')}):api('changepw',{password:v('password')});}
-  p.then(function(j){if(!j)return;if(j.__ok)done();else fail(j.error||'Something went wrong. Try again.');}).catch(function(){fail('Could not reach the site. Check your connection.');});});
+  else if(kind==='fg')p=api('forgot',{email:v('email')}).then(function(j){if(j.__ok){er.style.color='#1b6b3a';er.innerHTML='Done. If that email has an account, a reset link is on its way. Check your inbox and spam folder. If you signed up before security codes existed, or you cannot find your code, contact the administrator: '+blankC()+'.';btn.disabled=false;return null;}return j;});
+  else if(kind==='vc'){p=api('verifycode',{token:RC,code:v('code')});}
+  else{if(v('password')!==v('confirm')){fail('The two passwords do not match.');return;}p=kind==='reset'?api('reset',{token:RT||RC,password:v('password')}):api('changepw',{password:v('password')});}
+  p.then(function(j){if(!j)return;if(j.__ok){if(kind==='up'&&j.securityCode){showCode(j.securityCode,done);return;}if(kind==='vc'){var w=document.getElementById('vc-wrap');if(w)w.outerHTML=resetFormHtml();er.textContent='';return;}done();}else if(j.code==='locked'){var w2=document.getElementById('vc-wrap')||f;if(w2)w2.hidden=true;lockedMsg(er);}else fail(j.error||'Something went wrong. Try again.');}).catch(function(){fail('Could not reach the site. Check your connection.');});});
 })();
 
 </script>
@@ -863,7 +884,8 @@ function adminHtml(){
   h+='<h2>Who has access ('+(A.approved.length+1)+')</h2><div class="tbl"><table><thead><tr><th>Person</th><th>Access</th><th>Time</th>'+(O?'<th></th>':'')+'</tr></thead><tbody>';
   h+='<tr><td><strong>Owner</strong> <small class="muted">'+esc(O&&A.email?A.email:'simeonbarry057@gmail.com')+'</small></td><td><span class="pill ok">Owner</span> full control</td><td>Permanent</td>'+(O?'<td></td>':'')+'</tr>';
   A.approved.forEach(function(r){var exp=r.expiresAt?new Date(r.expiresAt).getTime():0,left=exp?remaining(exp-Date.now()):'No expiry',gone=exp&&exp<Date.now();
-    h+='<tr><td><strong>'+esc(r.name||'Unnamed')+'</strong><br><small class="muted">since '+esc(r.at?new Date(r.at).toLocaleDateString():'?')+'</small></td><td><span class="pill '+(r.role==='admin'?'warn':'')+'">'+roleOf(r)+'</span> '+(r.role==='admin'?'sees this page':'study content')+'</td><td>'+(gone?'<span class="pill bad">expired</span>':esc(left))+(exp?'<br><small class="muted">ends '+esc(new Date(exp).toLocaleDateString())+'</small>':'')+'</td>'
+    var lu=(A.users||[]).filter(function(x){return x.id===r.id;})[0];
+    h+='<tr><td><strong>'+esc(r.name||'Unnamed')+'</strong>'+(lu&&lu.locked?' <span class="pill bad">Blocked</span>':'')+'<br><small class="muted">since '+esc(r.at?new Date(r.at).toLocaleDateString():'?')+'</small></td><td><span class="pill '+(r.role==='admin'?'warn':'')+'">'+roleOf(r)+'</span> '+(r.role==='admin'?'sees this page':'study content')+'</td><td>'+(gone?'<span class="pill bad">expired</span>':esc(left))+(exp?'<br><small class="muted">ends '+esc(new Date(exp).toLocaleDateString())+'</small>':'')+'</td>'
      +(O?'<td><div class="acts"><button class="btn small" data-act="role" data-id="'+esc(r.id)+'" data-role="'+(r.role==='admin'?'learner':'admin')+'">'+(r.role==='admin'?'Make learner':'Make admin')+'</button><button class="btn small danger" data-act="revoke" data-id="'+esc(r.id)+'">Revoke</button></div></td>':'')+'</tr>';});
   h+='</tbody></table></div><p class="muted">People you shared the page with from the Share menu are managed there, not here.</p>';
   if(O||A.canEdit){
@@ -877,12 +899,12 @@ function adminHtml(){
   }
   if(O&&window.__api){
     var now=Date.now();if(!A.usersAt||now-A.usersAt>15000){A.usersAt=now;window.__api('admin_users',{}).then(function(r){if(r&&r.users){A.users=r.users;if(V.route==='admin'&&A.mode==='ok'&&!document.activeElement.matches('input,select,textarea'))render();}});}
-    h+='<h2>Accounts and passwords</h2><p class="muted">The site cannot email people, so you send them the link or password yourself, for example on WhatsApp.</p>';
+    h+='<h2>Accounts and passwords</h2><p class="muted">When someone uses Forgot password, the site emails them a link automatically (they then enter their 5-digit security code). People who signed up before security codes existed have no code: send them a reset link or one-time password yourself, or give them a new security code. After 5 wrong codes an account is Blocked until you unlock it.</p>';
     if(A.secret)h+='<div class="secretbox" role="status"><b>'+esc(A.secret.title)+'</b><div class="secret-text">'+esc(A.secret.text)+'</div><p class="muted">'+esc(A.secret.note)+'</p><div class="acts"><button class="btn small good" data-act="copy-secret">Copy</button><button class="btn small" data-act="clear-secret">Done</button></div></div>';
     if(!A.users)h+='<p class="muted">Loading accounts…</p>';
     else{h+='<div class="tbl"><table><thead><tr><th>Person</th><th>Email</th><th></th></tr></thead><tbody>';
       A.users.slice().sort(function(a,b){return (b.resetRequested?1:0)-(a.resetRequested?1:0);}).forEach(function(u){
-        h+='<tr><td><strong>'+esc(u.name||'Unnamed')+'</strong>'+(u.resetRequested?' <span class="pill bad">asked for a reset</span>':'')+(u.mustChange?' <span class="pill warn">must set new password</span>':'')+(u.role==='owner'?' <span class="pill ok">owner</span>':'')+'</td><td>'+esc(u.email)+'</td><td><div class="acts"><button class="btn small" data-act="reset-link" data-id="'+esc(u.id)+'">Reset link</button>'+(u.role==='owner'?'':'<button class="btn small" data-act="otp" data-id="'+esc(u.id)+'">One-time password</button>')+'</div></td></tr>';});
+        h+='<tr><td><strong>'+esc(u.name||'Unnamed')+'</strong>'+(u.locked?' <span class="pill bad">Blocked</span>':'')+(u.resetRequested?' <span class="pill bad">asked for a reset</span>':'')+(u.role!=='owner'&&!u.hasCode?' <span class="pill">no security code</span>':'')+(u.mustChange?' <span class="pill warn">must set new password</span>':'')+(u.role==='owner'?' <span class="pill ok">owner</span>':'')+'</td><td>'+esc(u.email)+'</td><td><div class="acts"><button class="btn small" data-act="reset-link" data-id="'+esc(u.id)+'">Reset link</button>'+(u.locked?'<button class="btn small good" data-act="unlock" data-id="'+esc(u.id)+'">Unlock</button>':'')+(u.role==='owner'?'':'<button class="btn small" data-act="newcode" data-id="'+esc(u.id)+'">New security code</button><button class="btn small" data-act="otp" data-id="'+esc(u.id)+'">One-time password</button>')+'</div></td></tr>';});
       h+='</tbody></table></div>';}
   }
   return h+'</div>';
@@ -973,6 +995,9 @@ function accountHtml(){
   h+='<h2>Layout</h2><div class="seg" role="group" aria-label="Layout"><button data-act="layout" data-v="notebook" aria-pressed="'+(S.layout==='notebook')+'">Notebook</button><button data-act="layout" data-v="workspace" aria-pressed="'+(S.layout==='workspace')+'">Workspace</button></div>';
   h+='<h2>Theme</h2><div class="seg" role="group" aria-label="Theme">'+['auto','light','dark'].map(function(x){return '<button data-act="theme" data-v="'+x+'" aria-pressed="'+(S.theme===x)+'">'+(x==='auto'?'Auto':x==='light'?'Light':'Dark')+'</button>';}).join('')+'</div>';
   h+='<h2>Heading font</h2><button class="pill-btn" data-act="rainbow" aria-pressed="'+(!!S.rainbow)+'">Rainbow font</button>';
+  if(window.__api&&!A.isOwner){h+='<h2>Security code</h2>';
+    if(A.myCode)h+='<p class="muted">Keep this code private. You need it to reset your password.</p><div class="code-big code-mine" aria-label="Your security code">'+String(A.myCode).split('').map(function(d){return '<i>'+esc(d)+'</i>';}).join('')+'</div><button class="btn" data-act="hidecode">Hide code</button>';
+    else h+='<p class="muted">The 5-digit code you wrote down when you signed up. Enter your password to see it again.</p><label class="sr" for="mc-pw">Your password</label><input id="mc-pw" type="password" autocomplete="current-password" placeholder="Your password" style="max-width:280px;margin-right:8px"> <button class="btn" data-act="showcode">Show my security code</button>';}
   h+='<h2>Your totals</h2><ul><li>CCNA score: '+credits()+' / '+TOTAL_CREDITS+'</li><li>Questions to review: '+Object.keys(S.mistakes).length+'</li></ul>';
   h+='<h2>Sign out</h2><p>Saves your progress to your account, clears the copy on this device and returns to the sign-in page. To sign out of your claude.ai account itself, use the account menu on claude.ai.</p><button class="btn" data-act="signout">Sign out</button>';
   if(A.isAdmin)h+='<p><a class="btn" href="#admin" data-link="1" style="text-decoration:none">Manage access</a></p>';
@@ -1041,6 +1066,8 @@ document.addEventListener('click',function(e){
   if(act==='quit'){V.quiz=null;render();return;}
   if(act==='practise'){var ids=Object.keys(S.mistakes).filter(function(id){return QIDX[id];}).slice(0,10);startQuiz(ids.map(function(id){return QIDX[id].q;}),{mode:'easy',label:'Mistake review'});return;}
   if(act==='clear-miss'){delete S.mistakes[el.getAttribute('data-id')];save();render();return;}
+  if(act==='hidecode'){A.myCode=null;render();return;}
+  if(act==='showcode'&&window.__api){var pw0=$('#mc-pw');window.__api('mycode',{password:pw0?pw0.value:''}).then(function(r){if(r.code){A.myCode=r.code;render();}else if(r.none)toast('You do not have a security code yet. Contact the administrator.');else toast(r.error||'Could not show the code.');});return;}
   if(act==='request'){doRequest();return;}
   if(A.isOwner){var id=el.getAttribute('data-id');
     if(act==='approve'){var sel=$('#dur-'+id),days=sel?+sel.value:30,r=A.requests.filter(function(x){return x.id===id;})[0]||{name:''};adminSet('approved/'+id,{name:r.name||'',at:new Date().toISOString(),role:($('#role-'+id)&&$('#role-'+id).value==='admin')?'admin':'learner',expiresAt:days?new Date(Date.now()+days*864e5).toISOString():null}).then(function(){return A.db.doc('requests/'+id).delete();}).then(function(){toast('Approved');}).catch(function(){toast('Could not approve. Try again.');});return;}
@@ -1048,6 +1075,8 @@ document.addEventListener('click',function(e){
     if(act==='clear-alert'){A.db.doc('alerts/'+id).delete().catch(function(){toast('Could not clear.');});return;}
     if(act==='reset-link'&&window.__api){window.__api('admin_reset_link',{id:id}).then(function(r){if(r.url){A.secret={title:'Reset link for '+r.name,text:r.url,note:'Works once and lasts 2 hours. Send it to them yourself.'};render();}else toast(r.error||'Could not make a link.');});return;}
     if(act==='otp'&&window.__api){window.__api('admin_otp',{id:id}).then(function(r){if(r.password){A.secret={title:'One-time password for '+r.name,text:r.password,note:'Shown only now. Lasts 48 hours. They must choose a new password when they sign in. Their old password stops working now.'};A.usersAt=0;render();}else toast(r.error||'Could not make a password.');});return;}
+    if(act==='unlock'&&window.__api){window.__api('admin_unlock',{id:id}).then(function(r){if(r.ok){toast('Unlocked '+(r.name||''));A.usersAt=0;render();}else toast(r.error||'Could not unlock.');});return;}
+    if(act==='newcode'&&window.__api){window.__api('admin_newcode',{id:id}).then(function(r){if(r.code){A.secret={title:'New security code for '+r.name,text:r.code,note:'Shown only now. Give it to them yourself. It also unlocks the account if it was blocked.'};A.usersAt=0;render();}else toast(r.error||'Could not make a code.');});return;}
     if(act==='copy-secret'&&A.secret){try{navigator.clipboard.writeText(A.secret.text).then(function(){toast('Copied');},function(){toast('Select the text and copy it.');});}catch(x){toast('Select the text and copy it.');}return;}
     if(act==='clear-secret'){A.secret=null;render();return;}
     if(act==='deny'){A.db.doc('requests/'+id).update({status:'denied'}).catch(function(){toast('Could not save.');});return;}
@@ -1086,7 +1115,7 @@ function lockModal(t){
   });
   var f=m.querySelector('[data-lm="free"]')||m.querySelector('[data-lm="close"]');if(f)f.focus();
 }
-function route(){var h=location.hash.slice(1)||'home';
+function route(){var h=location.hash.slice(1)||'home';A.myCode=null;
   if(h.indexOf('t-')===0&&TB[h.slice(2)]&&isLocked(h.slice(2))){var back=V.okRoute||'home';history.replaceState(null,'','#'+back);lockModal(TB[h.slice(2)]);if(V.okRoute===undefined){V.okRoute='home';V.route='home';V.quiz=null;V.tab='lesson';render();}return;}
   var lm0=document.getElementById('lock-modal');if(lm0)lm0.remove();
   V.okRoute=h;V.route=h;V.quiz=null;V.rail=false;V.tab='lesson';if(h.indexOf('t-')===0&&TB[h.slice(2)]){var tt=TB[h.slice(2)],sb=subjOfTopic(tt);S.last=tt.id;S.subject=sb;S.lastBy[sb]=tt.id;save();}else if(h==='ccna'||h==='excel'){S.subject=h;save();}render();window.scrollTo({top:0});}
