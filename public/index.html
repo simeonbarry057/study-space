@@ -588,6 +588,37 @@ html[data-layout="magazine"] .sheet .page-head+*>p:first-of-type::first-letter,h
 .layout-sel{appearance:auto;cursor:pointer;font:inherit;font-weight:700;font-size:.85rem;padding:8px 12px;color:var(--fg);max-width:190px}
 html[data-layout="terminal"] .topbar select.layout-sel{background:#131a24 !important;color:#d7e0ee !important;border-color:#2c384a !important}
 html[data-layout="magazine"] .topbar select.layout-sel{background:#fff;color:#2a1f3d}
+/* ---- Notebook pages restyled for the non-notebook layouts ---- */
+html:not([data-layout="notebook"]) .replica-book{gap:8px;margin:0 0 10px}
+html:not([data-layout="notebook"]) .replica-sheet{background:none;box-shadow:none;padding:0 0 10px;font:400 1rem/1.7 var(--font-ui);letter-spacing:0;color:var(--fg);overflow:visible}
+html:not([data-layout="notebook"]) .replica-sheet :is(p,li,h3,h4,span,u){color:inherit}
+html:not([data-layout="notebook"]) .replica-types{padding-top:6px;border-top:1px solid var(--line)}
+html:not([data-layout="notebook"]) .replica-title{text-align:left;padding:0;margin:0 0 6px}
+html:not([data-layout="notebook"]) .replica-title h3{font:700 1.55rem/1.25 var(--font-ui)!important;letter-spacing:0;text-decoration:none;color:inherit;display:block}
+html:not([data-layout="notebook"]) .replica-title h3 br{display:inline-block;width:.3em}
+html:not([data-layout="notebook"]) .replica-art{max-width:360px}
+html:not([data-layout="notebook"]) .replica-purpose{align-items:start;gap:24px}
+html:not([data-layout="notebook"]) .replica-sheet h4{display:block;border:0;border-radius:0;padding:0;margin:16px 0 4px;font:700 1.12rem/1.3 var(--font-ui)}
+html:not([data-layout="notebook"]) .replica-number{border:1.5px solid currentColor;width:1.5em;height:1.5em;font-size:.85em;margin-right:8px;position:static!important}
+html:not([data-layout="notebook"]) .replica-network-row h4{padding-left:0}
+html:not([data-layout="notebook"]) .replica-network-row h4 .replica-number{position:static}
+html:not([data-layout="notebook"]) .replica-art{background:#d9dbea;border-radius:14px;padding:10px;line-height:0}
+html:not([data-layout="notebook"]) .replica-page-end{display:none}
+html:not([data-layout="notebook"]) .replica-type-summary li{font-size:1rem}
+html:not([data-layout="notebook"]) .replica-arrow{stroke:currentColor}
+/* terminal */
+html[data-layout="terminal"] .replica-sheet{color:#b9c5d8}
+html[data-layout="terminal"] .replica-title h3{color:#fff}
+html[data-layout="terminal"] .replica-sheet h4{color:#5ee6a8}
+html[data-layout="terminal"] .replica-sheet h4::before{content:"// ";opacity:.6}
+html[data-layout="terminal"] .replica-number{color:#5ee6a8}
+/* magazine */
+html[data-layout="magazine"] .replica-sheet{color:#2a1f3d}
+html[data-layout="magazine"] .replica-title h3{font-size:2rem!important}
+html[data-layout="magazine"] .replica-sheet h4{display:table;border-bottom:2px solid #d6336c;padding-bottom:2px}
+html[data-layout="magazine"] .replica-sheet p,html[data-layout="magazine"] .replica-sheet li{font-size:1.1rem;line-height:1.75}
+html[data-layout="magazine"] .replica-number{color:#d6336c}
+html[data-layout="magazine"] .replica-art{background:#ffffffb8}
 
 
 body{margin:0}
