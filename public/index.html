@@ -839,11 +839,10 @@ function lessonHtml(t){
   var h='<div class="sheet">';
   h+='<div class="page-head"><span class="kicker">'+esc(D.stages.filter(function(s){return s.id===t.stage;})[0].title)+'</span><h1>'+esc(t.title)+'</h1><p>'+esc(t.goal)+'</p>'+domPills(t)+'</div>';
   h+=tabsHtml();
-  if(t.id==='network-basics'&&S.layout==='notebook'){h+=(A.isAdmin?'<p class="muted">Admin: tap any line on the notebook pages below to edit it. Changes save automatically.</p><button class="btn small" data-act="reset-replica">Restore original wording</button>':'')+'</div>'+replica()+'<div class="sheet" style="margin-top:22px">';}
+  if(t.id==='network-basics'){h+=(A.isAdmin?'<p class="muted">Admin: tap any line on the notebook pages below to edit it. Changes save automatically.</p><button class="btn small" data-act="reset-replica">Restore original wording</button>':'')+'</div>'+replica()+'<div class="sheet" style="margin-top:22px">';}
   if(t.prerequisites.length)h+='<h3>Before this topic</h3><p>'+t.prerequisites.map(function(p){return '<a href="#t-'+esc(p)+'" data-link="1">'+esc(TB[p]?TB[p].title:p)+'</a>';}).join(' · ')+'</p>';
   h+='<h2>What to learn</h2>'+list(t.learn);
   var sc=SCENES[t.id];if(sc)h+='<h2>Picture it</h2><div class="scene-grid">'+sc.map(scene).join('')+'</div>';
-  if(t.id==='network-basics'&&S.layout!=='notebook'){h+='<h2>Types of networks</h2><div class="scene-grid">'+NT.map(function(x){return '<figure class="story-scene" style="margin:0"><img src="'+ART[x.a[0]]+'" alt="Hand-drawn '+x.n+' network" style="display:block;width:100%;max-width:340px;height:auto;margin:auto"><figcaption>'+x.n+' · '+esc(x.f)+'</figcaption></figure>';}).join('')+'</div>';}
   var n=D.nar[t.id];if(n){h+='<h2>The story</h2>'+n.paragraphs.map(function(p){return '<p>'+esc(p)+'</p>';}).join('')+reveal('Think first: '+n.question,'<p>'+esc(n.answer)+'</p>');}
   if(D.guides[t.id])h+=guideHtml(D.guides[t.id]);
   var ck=D.ck[t.id];if(ck){var sel=S.cp[t.id];h+='<h2>Checkpoint</h2><p class="q-text">'+esc(ck.question)+'</p><div class="opts">'+ck.options.map(function(o,i){var cls=sel==null?'':(i===ck.correct?' right':(i===sel?' wrong':''));return '<button class="opt'+cls+'" data-act="cp" data-tid="'+esc(t.id)+'" data-i="'+i+'"'+(sel!=null?' disabled':'')+'><b>'+'ABC'[i]+'</b><span>'+esc(o)+'</span></button>';}).join('')+'</div>';
