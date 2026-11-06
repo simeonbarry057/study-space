@@ -742,6 +742,10 @@ html body .sheet.cv .cstat.t-Pending{background:#f3d98f;border-color:#c9a24a}htm
 html body .sheet.cv .cstat.t-Failed{background:#efc2b8;border-color:#c0675a}html body .sheet.cv .cstat.t-Failed b,html body .sheet.cv .cstat.t-Failed span{color:#8a1d14}
 .ctn{display:inline-block;min-width:1.5em;text-align:center;font:700 .74rem var(--font-ui,inherit);padding:1px 7px;border-radius:99px;background:#0001;margin-left:4px}
 html body .sheet.cv .ctn{background:#e6cf96;color:#3a2912}html body .sheet.cv .ctn.tn-w{background:#f3d98f;color:#6b4300}
+.rs-box{background:var(--surface,#fff);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.rs-box p{flex-basis:100%;margin:4px 0}
+.rs-box input[type=file],.rs-box select{max-width:100%;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface,#fff);color:var(--fg)}
+.btn.bad{background:#b3261e;color:#fff;border-color:#b3261e}
 
 
 body{margin:0}
@@ -1125,6 +1129,11 @@ function adminHtml(){
       A.users.slice().sort(function(a,b){return (b.resetRequested?1:0)-(a.resetRequested?1:0);}).forEach(function(u){
         h+='<tr><td><strong>'+esc(u.name||'Unnamed')+'</strong>'+(u.locked?' <span class="pill bad">Blocked</span>':'')+(u.resetRequested?' <span class="pill bad">asked for a reset</span>':'')+(u.role!=='owner'&&!u.hasCode?' <span class="pill">no security code</span>':'')+(u.mustChange?' <span class="pill warn">must set new password</span>':'')+(u.role==='owner'?' <span class="pill ok">owner</span>':'')+'</td><td>'+esc(u.email)+'</td><td><div class="acts"><button class="btn small" data-act="reset-link" data-id="'+esc(u.id)+'">Reset link</button>'+(u.locked?'<button class="btn small good" data-act="unlock" data-id="'+esc(u.id)+'">Unlock</button>':'')+(u.role==='owner'?'':'<button class="btn small" data-act="viewcode" data-id="'+esc(u.id)+'">View security code</button><button class="btn small" data-act="newcode" data-id="'+esc(u.id)+'">New security code</button><button class="btn small" data-act="otp" data-id="'+esc(u.id)+'">One-time password</button>')+'</div></td></tr>';});
       h+='</tbody></table></div>';}
+    h+='<h2>Restore from a backup</h2><p class="muted">Only if data was lost. Pick a "Study Space backup ….json" file from your Google Drive. First press Check backup: it shows what would happen and changes nothing.</p><div class="rs-box"><input type="file" id="rs-file" accept=".json,application/json" aria-label="Backup file"> <select id="rs-mode" aria-label="Restore mode"><option value="missing"'+((A.rsMode||'missing')==='missing'?' selected':'')+'>Add only what is missing (safe)</option><option value="all"'+(A.rsMode==='all'?' selected':'')+'>Replace with the backup (undoes newer changes)</option></select> <button type="button" class="btn small" data-act="rs-check">Check backup</button>';
+    if(A.rsName)h+='<p class="muted">File: '+esc(A.rsName)+'</p>';
+    if(A.rs&&A.rs.ok)h+='<p><b>'+(A.rs.dry?'Check result':'Restored')+':</b> backup made '+esc(A.rs.backupAt?new Date(A.rs.backupAt).toLocaleString():'(unknown time)')+'. '+A.rs.users+' accounts, '+A.rs.docs+' records'+(A.rs.dry?' would be written':' written')+', '+A.rs.skipped+' left as they are.</p>'+(A.rs.dry?'<button type="button" class="btn small '+(A.rsConfirm?'bad':'good')+'" data-act="rs-go">'+(A.rsConfirm?'Press again to confirm the restore':'Restore now')+'</button>':'');
+    if(A.rsErr)h+='<p class="auth-err" role="alert">'+esc(A.rsErr)+'</p>';
+    h+='</div>';
   }
   return h+'</div>';
 }
@@ -1359,6 +1368,12 @@ document.addEventListener('click',function(e){
     if(act==='reset-link'&&window.__api){window.__api('admin_reset_link',{id:id}).then(function(r){if(r.url){A.secret={title:'Reset link for '+r.name,text:r.url,note:'Works once and lasts 2 hours. Send it to them yourself.'};render();}else toast(r.error||'Could not make a link.');});return;}
     if(act==='otp'&&window.__api){window.__api('admin_otp',{id:id}).then(function(r){if(r.password){A.secret={title:'One-time password for '+r.name,text:r.password,note:'Shown only now. Lasts 48 hours. They must choose a new password when they sign in. Their old password stops working now.'};A.usersAt=0;render();}else toast(r.error||'Could not make a password.');});return;}
     if(act==='unlock'&&window.__api){window.__api('admin_unlock',{id:id}).then(function(r){if(r.ok){toast('Unlocked '+(r.name||''));A.usersAt=0;render();}else toast(r.error||'Could not unlock.');});return;}
+    if(act==='rs-check'){var fi=document.getElementById('rs-file');var f0=fi&&fi.files&&fi.files[0];
+      if(!f0){if(!A.rsBk){A.rsErr='Choose a backup file first.';render();return;}}
+      var run=function(){A.rsErr='';A.rsConfirm=false;window.__api('admin_restore',{backup:A.rsBk,mode:A.rsMode||'missing',dry:true}).then(function(r){if(r&&r.ok){A.rs=r;}else{A.rs=null;A.rsErr=(r&&r.error)||'Could not check that file.';}render();});};
+      if(f0){var fr=new FileReader();fr.onload=function(){try{A.rsBk=JSON.parse(fr.result);A.rsName=f0.name;run();}catch(x){A.rsBk=null;A.rs=null;A.rsErr='That file is not a valid backup (it could not be read as JSON).';render();}};fr.readAsText(f0);}else run();return;}
+    if(act==='rs-go'){if(!A.rsConfirm){A.rsConfirm=true;render();return;}
+      window.__api('admin_restore',{backup:A.rsBk,mode:A.rsMode||'missing'}).then(function(r){A.rsConfirm=false;if(r&&r.ok){A.rs=r;A.rsBk=null;toast('Backup restored.');}else A.rsErr=(r&&r.error)||'Restore failed.';A.usersAt=0;render();});return;}
     if(act==='newcode'&&window.__api){window.__api('admin_newcode',{id:id}).then(function(r){if(r.code){A.secret={title:'New security code for '+r.name,text:r.code,note:(r.emailed?'It was also emailed to them. ':'It could not be emailed (learner emails are not set up yet), so give it to them yourself. ')+'It also unlocks the account if it was blocked. You can see it again any time with View security code.'};A.usersAt=0;render();}else toast(r.error||'Could not make a code.');});return;}
     if(act==='viewcode'&&window.__api){window.__api('admin_viewcode',{id:id}).then(function(r){if(r.code){A.secret={title:'Security code for '+r.name,text:r.code,note:'Only you can see this. Use it if they say they never received their code.'};render();}else if(r.none)toast(r.name+' has no security code. Use New security code.');else toast(r.error||'Could not read the code.');});return;}
     if(act==='copy-secret'&&A.secret){try{navigator.clipboard.writeText(A.secret.text).then(function(){toast('Copied');},function(){toast('Select the text and copy it.');});}catch(x){toast('Select the text and copy it.');}return;}
@@ -1368,7 +1383,7 @@ document.addEventListener('click',function(e){
     if(act==='remove-req'){A.db.doc('requests/'+id).delete();return;}
   }
 });
-document.addEventListener('change',function(e){var el=e.target;if(el.id==='layout-sel'){S.layout=el.value;applyLook();save();render();return;}if(el.getAttribute&&el.getAttribute('data-act')==='step'){var tid=el.getAttribute('data-tid'),k=el.getAttribute('data-key');var L=(S.labs[tid]||(S.labs[tid]={steps:{}}));if(!L.steps)L.steps={};if(el.checked)L.steps[k]=1;else delete L.steps[k];save();var rail=$('.rail');if(rail)rail.innerHTML=railHtml();}});
+document.addEventListener('change',function(e){var el=e.target;if(el.id==='rs-mode'){A.rsMode=el.value;A.rs=null;A.rsConfirm=false;render();return;}if(el.id==='layout-sel'){S.layout=el.value;applyLook();save();render();return;}if(el.getAttribute&&el.getAttribute('data-act')==='step'){var tid=el.getAttribute('data-tid'),k=el.getAttribute('data-key');var L=(S.labs[tid]||(S.labs[tid]={steps:{}}));if(!L.steps)L.steps={};if(el.checked)L.steps[k]=1;else delete L.steps[k];save();var rail=$('.rail');if(rail)rail.innerHTML=railHtml();}});
 document.addEventListener('input',function(e){var el=e.target;if(el.getAttribute&&el.getAttribute('data-act')==='notes'){S.notes[el.getAttribute('data-tid')]=el.value;save();}if(el.id==='rail-search'){V.filter=el.value;V.filterFocus=true;var rail=$('.rail');rail.innerHTML=railHtml();var sb=$('#rail-search');sb.focus();sb.setSelectionRange(sb.value.length,sb.value.length);}});
 document.addEventListener('focusout',function(e){if(e.target.id==='rail-search')V.filterFocus=false;});
 function doSignOut(){

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Emergency restore</title>
+<style>
+:root{color-scheme:light dark;--bg:#f4f1ea;--fg:#1d2430;--line:#c9c2b0;--card:#fff;--bad:#b3261e;--ok:#1b7a43}
+@media (prefers-color-scheme:dark){:root{--bg:#161b22;--fg:#e6edf3;--line:#39424e;--card:#1f2630;--bad:#ff9a92;--ok:#6fd49a}}
+body{margin:0;padding:24px 16px;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,sans-serif}
+main{max-width:560px;margin:0 auto}h1{font-size:1.5rem;margin:0 0 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-top:16px}
+label{display:block;font-weight:600;margin:12px 0 4px}input,button{font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;width:100%;box-sizing:border-box;background:var(--card);color:var(--fg)}
+button{cursor:pointer;font-weight:600;margin-top:14px}button.go{background:#2d438f;color:#fff;border-color:#2d438f}
+.msg{margin-top:14px}.err{color:var(--bad)}.ok{color:var(--ok)}.muted{opacity:.75;font-size:.92rem}
+</style></head><body><main>
+<h1>Emergency restore</h1>
+<p class="muted">For the site owner only. This works only when the site's storage is empty (for example a brand new store after a failure) and needs your owner setup code. If the site already has accounts it refuses, and you should use Restore on the admin page instead.</p>
+<form class="card" id="f">
+<label for="file">Backup file ("Study Space backup ….json" from Google Drive)</label><input id="file" type="file" accept=".json,application/json" required>
+<label for="setup">Owner setup code</label><input id="setup" type="password" autocomplete="off" required>
+<button type="button" id="chk">Check backup (changes nothing)</button>
+<button type="submit" class="go" id="go" disabled>Restore</button>
+<div class="msg" id="msg" role="status"></div>
+</form>
+<script>
+var bk=null,msg=document.getElementById('msg');
+function say(t,c){msg.className='msg '+(c||'');msg.textContent=t;}
+function call(dry){return fetch('/api/restore_boot',{method:'POST',headers:{'Content-Type':'application/json','x-ss':'1'},body:JSON.stringify({setup:document.getElementById('setup').value,backup:bk,dry:dry})}).then(function(r){return r.json().then(function(j){return {s:r.status,j:j};});});}
+function load(){var f=document.getElementById('file').files[0];return new Promise(function(res,rej){if(!f)return rej('Choose the backup file.');var r=new FileReader();r.onload=function(){try{bk=JSON.parse(r.result);res();}catch(e){rej('That file is not valid JSON.');}};r.readAsText(f);});}
+document.getElementById('chk').onclick=function(){load().then(function(){return call(true);}).then(function(o){if(o.j.ok){say('Backup made '+(o.j.backupAt||'(unknown time)')+': '+o.j.users+' accounts and '+o.j.docs+' records would be restored.','ok');document.getElementById('go').disabled=false;}else{say(o.j.error||'Refused.','err');document.getElementById('go').disabled=true;}}).catch(function(e){say(String(e),'err');});};
+document.getElementById('f').onsubmit=function(e){e.preventDefault();if(!bk)return;call(false).then(function(o){if(o.j.ok){say('Restored '+o.j.users+' accounts and '+o.j.docs+' records. You can now sign in at the home page with your usual password.','ok');document.getElementById('go').disabled=true;}else say(o.j.error||'Refused.','err');}).catch(function(){say('Could not reach the site.','err');});};
+</script>
+</main></body></html>

@@ -16,6 +16,8 @@ module.exports=async(req,res)=>{
     else if(a==='verifycode'&&req.method==='POST')out=await core.verifycode(req);
     else if(a==='admin_unlock'&&req.method==='POST')out=await core.adminUnlock(req);
     else if(a==='admin_newcode'&&req.method==='POST')out=await core.adminNewCode(req);
+    else if(a==='admin_restore'&&req.method==='POST')out=await core.adminRestore(req);
+    else if(a==='restore_boot'&&req.method==='POST')out=await core.restoreBoot(req);
     else if(a==='admin_viewcode'&&req.method==='POST')out=await core.adminViewCode(req);
     else if(a==='cron'&&req.method==='GET')out=await core.cron(req);
     else if(a==='backup'&&req.method==='GET')out=await core.backup(req);
