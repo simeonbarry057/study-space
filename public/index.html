@@ -514,9 +514,9 @@ body{margin:0}
  .welcome-main .learn{display:none}
  .hero{min-height:calc(100vh - 150px);align-content:center;align-items:center}
  .hero>.gate-box{align-self:center}
- html,body{overflow-y:hidden}
+ html:has(.welcome-main),html:has(.welcome-main) body{overflow-y:hidden}
 }
-@media (min-width:861px) and (max-height:520px){html,body{overflow-y:auto}}
+@media (min-width:861px) and (max-height:520px){html:has(.welcome-main),html:has(.welcome-main) body{overflow-y:auto}}
 
 </style></head><body>
 <div id="app"><div style="padding:40px 0;color:var(--muted)">Loading study site…</div></div>
