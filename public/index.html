@@ -574,6 +574,14 @@ html[data-layout="terminal"] .topbar{background:#0a0d12 !important;backdrop-filt
 html[data-layout="terminal"] .rail-search{background:#0a0d12 !important;color:#d7e0ee !important}
 html[data-layout="terminal"] .topbar :is(.btn,.seg button,.tabs button,button){background:#131a24 !important;color:#d7e0ee !important;border-color:#2c384a !important}
 html[data-layout="terminal"] .topbar :is(.brand,.acct-name){color:#d7e0ee !important}
+:root:root[data-layout="terminal"]{--glass:rgba(10,13,18,.94);--glass-strong:#0a0d12;--glass-edge:#222a36;--glass-shadow:0 8px 26px #0008;--bub:#5ee6a8}
+:root:root[data-layout="magazine"]{--bg:#fdeef3;--surface:#ffffff;--surface-2:#f6eef8;--fg:#2a1f3d;--muted:#5c4e78;--line:#2a1f3d22;--glass:rgba(255,255,255,.72);--glass-strong:rgba(255,255,255,.88);--glass-edge:#ffffff;--glass-shadow:0 8px 24px #2a1f3d1f;--bub:#d6336c;color-scheme:light}
+html[data-layout="terminal"] .acct-menu a,html[data-layout="terminal"] .acct-menu p,html[data-layout="terminal"] .acct-menu button{color:#d7e0ee !important}
+html[data-layout="terminal"] .acct-menu a:hover{background:#16202e}
+.seg button:not([aria-pressed="true"]){color:var(--fg)}
+html[data-layout="magazine"] .sheet .btn.good{background:#0f6b3f;color:#fff;border-color:#0f6b3f}
+html[data-layout="magazine"] .sheet .btn.primary{background:#2a1f3d;color:#fff}
+html[data-layout="terminal"] .sheet .btn.good{background:#5ee6a8;color:#06130d}
 
 
 body{margin:0}
@@ -707,7 +715,7 @@ var A={free:false,out:false,mode:'checking',isOwner:false,canEdit:false,isAdmin:
 var dbTimer=null,progressLoaded=false;
 try{A.out=LS.get('ccna-out')==='1';}catch(e){}
 function effDark(){return S.theme==='dark'||(S.theme!=='light'&&!!window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);}
-function applyLook(){var r=document.documentElement;r.dataset.layout=S.layout;r.dataset.rainbow=S.rainbow?'on':'off';if(S.theme==='light'||S.theme==='dark')r.dataset.theme=S.theme;else r.removeAttribute('data-theme');}
+function applyLook(){var r=document.documentElement;r.dataset.layout=S.layout;r.dataset.rainbow=S.rainbow?'on':'off';if(S.layout==='terminal')r.dataset.theme='dark';else if(S.layout==='magazine')r.dataset.theme='light';else if(S.theme==='light'||S.theme==='dark')r.dataset.theme=S.theme;else r.removeAttribute('data-theme');}
 function save(){if(A.out)return;LS.set('ccna-site-v1',JSON.stringify(S));if(A.db&&A.id&&progressLoaded){clearTimeout(dbTimer);dbTimer=setTimeout(function(){try{A.db.doc('data/users/'+A.id+'/progress').set({json:JSON.stringify(S),at:new Date().toISOString()}).catch(function(){});}catch(e){}},1500);}}
 function toast(m){A.toast=m;var el=$('#toast');if(el)el.remove();var d=document.createElement('div');d.className='toast';d.id='toast';d.setAttribute('role','status');d.textContent=m;document.body.appendChild(d);setTimeout(function(){d.remove();},2600);}
 
