@@ -529,6 +529,51 @@ body.reading .main{max-width:1100px;margin-inline:auto;width:100%}
 .code-input{letter-spacing:.5em;text-align:center;font-size:1.6rem;font-weight:800}
 .btn.subj{opacity:.55;font-weight:600}.btn.subj.on{opacity:1;background:#e3f6e8;border-color:#2e8b57;color:#14532d}
 body:has(.main.bare) .admin-row{max-width:none}
+/* ---- Layout: Terminal ---- */
+:root:root[data-layout="terminal"]{--bg:#0e1117;--surface:#131a24;--surface-2:#0a0d12;--fg:#d7e0ee;--muted:#8a97ab;--line:#222a36;--font-ui:ui-monospace,'JetBrains Mono',Menlo,Consolas,monospace;--font-hand:ui-monospace,'JetBrains Mono',Menlo,Consolas,monospace;color-scheme:dark}
+html[data-layout="terminal"] body{background:var(--bg);font-family:var(--font-ui)}
+html[data-layout="terminal"] :is(.topbar,.rail,.sheet,.card,.acct-menu){font-family:var(--font-ui)}
+html[data-layout="terminal"] .rail{background:#0a0d12;border-right:1px solid var(--line)}
+html[data-layout="terminal"] .topic-btn{background:transparent !important;border:0;box-shadow:none;border-radius:6px;color:#8a97ab;backdrop-filter:none}
+html[data-layout="terminal"] .topic-btn .t{color:#9aa7bb}
+html[data-layout="terminal"] .rail-search{background:#0a0d12;border-color:#222a36;color:#d7e0ee}
+html[data-layout="terminal"] .rail .stage h2,html[data-layout="terminal"] .rail .stage h2 em{color:#6f7d92}
+html[data-layout="terminal"] :is(.topbar,.acct-menu,.free-note){background:#0a0d12;border-color:#222a36;color:#d7e0ee}
+html[data-layout="terminal"] :is(.topbar .btn,.seg button){background:#131a24;border-color:#2c384a;color:#d7e0ee}
+html[data-layout="terminal"] :is(.brand,.acct-name,.topbar .t){color:#d7e0ee}
+html[data-layout="terminal"] .topic-btn[aria-current="page"]{background:#16202e !important}
+html[data-layout="terminal"] .topic-btn[aria-current="page"] .t{color:#5ee6a8}
+html[data-layout="terminal"] .sheet{background:transparent;border:0;box-shadow:none;color:#b9c5d8}
+html[data-layout="terminal"] .sheet h1{color:#fff;font-size:1.9rem}
+html[data-layout="terminal"] .sheet :is(h2,h3){color:#5ee6a8;font-weight:700}
+html[data-layout="terminal"] .sheet h2::before{content:"// ";opacity:.6}
+html[data-layout="terminal"] .sheet .kicker{color:#5ee6a8}
+html[data-layout="terminal"] .sheet :is(p,li){line-height:1.7}
+html[data-layout="terminal"] .sheet pre,html[data-layout="terminal"] pre.cmd{background:#05070a;border:1px solid #222a36;border-radius:10px;color:#9ef0c4}
+html[data-layout="terminal"] .sheet .btn{background:#131a24;border-color:#2c384a;color:#d7e0ee}
+html[data-layout="terminal"] .sheet .btn.primary,html[data-layout="terminal"] .cta{background:#5ee6a8;color:#06130d;border-color:#5ee6a8}
+/* ---- Layout: Magazine ---- */
+:root:root[data-layout="magazine"]{--font-ui:Georgia,'Times New Roman',serif;--font-hand:Georgia,'Times New Roman',serif}
+html[data-layout="magazine"] body{background:linear-gradient(135deg,#ffefd5,#ffd6e8 55%,#d6e4ff) fixed;color:#2a1f3d;font-family:Georgia,'Times New Roman',serif}
+html[data-layout="magazine"] .topbar{background:transparent;border-bottom:1px solid #2a1f3d22;font-family:Inter,system-ui,sans-serif}
+html[data-layout="magazine"] body::before{background:transparent}
+html[data-layout="magazine"] .rail{background:#ffffff66;border:1px solid #2a1f3d14;border-radius:16px;font-family:Inter,system-ui,sans-serif;color:#2a1f3d}
+html[data-layout="magazine"] .topic-btn{color:#2a1f3d}
+html[data-layout="magazine"] .sheet{background:transparent;border:0;box-shadow:none;color:#2a1f3d;max-width:860px;margin-inline:auto;padding:30px 20px}
+html[data-layout="magazine"] .sheet :is(p,li,span,label,td,th,small,strong,em,b,div){color:#2a1f3d}
+html[data-layout="magazine"] .sheet h1{font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.04;color:#2a1f3d}
+html[data-layout="magazine"] .sheet .kicker{color:#d6336c;font-family:Inter,system-ui,sans-serif;letter-spacing:.2em}
+html[data-layout="magazine"] .sheet .page-head p{font-size:1.25rem;line-height:1.5;color:#4a3d66}
+html[data-layout="magazine"] .sheet :is(h2,h3){color:#2a1f3d;font-weight:700}
+html[data-layout="magazine"] .sheet h2{border-bottom:2px solid #d6336c;display:inline-block;padding-bottom:2px}
+html[data-layout="magazine"] .sheet p,html[data-layout="magazine"] .sheet li{font-size:1.1rem;line-height:1.75}
+html[data-layout="magazine"] .sheet .page-head+*>p:first-of-type::first-letter,html[data-layout="magazine"] .sheet .page-head+p::first-letter{font-size:3.4em;float:left;line-height:.85;padding-right:8px;color:#d6336c}
+html[data-layout="magazine"] .sheet .btn{background:#fff;border-color:#2a1f3d33;color:#2a1f3d;font-family:Inter,system-ui,sans-serif}
+html[data-layout="magazine"] .sheet .card,html[data-layout="magazine"] .sheet details{background:#ffffffb8;border-radius:14px;box-shadow:0 8px 26px #0001}
+html[data-layout="terminal"] .topbar{background:#0a0d12 !important;backdrop-filter:none !important;border-color:#222a36 !important}
+html[data-layout="terminal"] .rail-search{background:#0a0d12 !important;color:#d7e0ee !important}
+html[data-layout="terminal"] .topbar :is(.btn,.seg button,.tabs button,button){background:#131a24 !important;color:#d7e0ee !important;border-color:#2c384a !important}
+html[data-layout="terminal"] .topbar :is(.brand,.acct-name){color:#d7e0ee !important}
 
 
 body{margin:0}
@@ -1015,7 +1060,7 @@ function excelHomeHtml(){
 }
 function accountHtml(){
   var h='<div class="sheet acct-page"><div class="page-head"><span class="kicker">Account</span><h1>Account settings</h1><p>'+(A.email?'Signed in as '+esc(A.email)+'.':'You are signed in.')+' These choices are remembered on this device and saved with your progress.</p></div>';
-  h+='<h2>Layout</h2><div class="seg" role="group" aria-label="Layout"><button data-act="layout" data-v="notebook" aria-pressed="'+(S.layout==='notebook')+'">Notebook</button><button data-act="layout" data-v="workspace" aria-pressed="'+(S.layout==='workspace')+'">Workspace</button></div>';
+  h+='<h2>Layout</h2><div class="seg" role="group" aria-label="Layout"><button data-act="layout" data-v="notebook" aria-pressed="'+(S.layout==='notebook')+'">Notebook</button><button data-act="layout" data-v="workspace" aria-pressed="'+(S.layout==='workspace')+'">Workspace</button><button data-act="layout" data-v="terminal" aria-pressed="'+(S.layout==='terminal')+'">Terminal</button><button data-act="layout" data-v="magazine" aria-pressed="'+(S.layout==='magazine')+'">Magazine</button></div>';
   h+='<h2>Theme</h2><div class="seg" role="group" aria-label="Theme">'+['auto','light','dark'].map(function(x){return '<button data-act="theme" data-v="'+x+'" aria-pressed="'+(S.theme===x)+'">'+(x==='auto'?'Auto':x==='light'?'Light':'Dark')+'</button>';}).join('')+'</div>';
   h+='<h2>Heading font</h2><button class="pill-btn" data-act="rainbow" aria-pressed="'+(!!S.rainbow)+'">Rainbow font</button>';
   if(window.__api&&!A.isOwner){h+='<h2>Security code</h2>';
