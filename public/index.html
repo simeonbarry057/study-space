@@ -451,6 +451,19 @@ html .sheet .paybox,html .sheet .paybox :is(p,b,strong,span,.muted){color:#ff1f4
 .secret-text{font:700 1.15rem var(--font-mono);word-break:break-all;user-select:all;padding:8px 10px;background:var(--surface-2);border-radius:10px}
 .secretbox .acts{display:flex;gap:8px}
 
+/* bold 2D/3D payment notice */
+html .free-note,html .paybox{position:relative;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 4px 16px;padding:12px 20px;border-radius:18px;
+ background:linear-gradient(180deg,#4a0a1c 0%,#26040e 55%,#18030a 100%)!important;border:2px solid #ff4766!important;
+ box-shadow:0 5px 0 #b3122f,0 9px 0 #5c0a19,0 16px 26px #ff1f4b77,inset 0 2px 0 #ff9bb0aa,inset 0 -8px 18px #ff1f4b44!important;
+ transform:translateY(-1px);font-weight:800;letter-spacing:.2px}
+html .free-note .fn-text,html .paybox,html .paybox :is(p,b,strong,span,.muted){color:#fff0f3!important;
+ text-shadow:1px 1px 0 #ff1f4b,2px 2px 0 #d10f33,3px 3px 0 #8c0f27,4px 5px 8px #000a!important;font-size:1rem;line-height:1.35}
+html .fn-badge{display:inline-block;padding:5px 14px;border-radius:999px;background:linear-gradient(180deg,#ff5d7a,#e0103a);color:#fff;font-weight:900;font-size:.82rem;letter-spacing:1.6px;
+ border:2px solid #ffc2cd;box-shadow:0 3px 0 #8c0f27,0 5px 10px #000a,inset 0 2px 0 #ffffff88;text-shadow:1px 2px 0 #8c0f27;text-transform:uppercase;white-space:nowrap}
+html .free-note::before{content:"";position:absolute;left:12px;right:12px;top:3px;height:38%;border-radius:14px 14px 40px 40px;background:linear-gradient(180deg,#ffffff22,#ffffff00);pointer-events:none}
+html .paybox .blank{border-bottom:3px solid #ff4766}
+html .free-note .fn-text{flex:1 1 340px;min-width:0}
+
 
 body{margin:0}
 .authtabs{display:flex;gap:8px;margin:0 0 6px}
@@ -914,7 +927,7 @@ function render(){
   if(A.out||A.mode!=='ok'){root.innerHTML='<div class="app">'+gateHtml()+'</div>';return;}
   var bare=!V.quiz&&(V.route==='home'||V.route==='account'||!V.route);
   root.innerHTML='<div class="app">'+topbarHtml(bare)+(bare?'<main class="main bare" id="main">'+mainHtml()+'</main>':'<div class="shell"><nav class="rail'+(V.rail?' open':'')+'" aria-label="Topics">'+railHtml()+'</nav>'+(V.rail?'<div class="scrim" data-act="rail"></div>':'')+'<main class="main" id="main">'+mainHtml()+'</main></div>')+'</div>';
-  if(A.free){var fa=root.firstChild,tb0=fa.querySelector('.topbar');if(tb0)tb0.insertAdjacentHTML('afterend','<div class="free-note" role="note">Free account: your first lesson is open. Other lessons need a payment, and the owner approves you once it is confirmed.</div>');}
+  if(A.free){var fa=root.firstChild,tb0=fa.querySelector('.topbar');if(tb0)tb0.insertAdjacentHTML('afterend','<div class="free-note" role="note"><span class="fn-badge">FREE ACCOUNT</span><span class="fn-text">Your first lesson is open. Other lessons need a payment, and the owner approves you once it is confirmed.</span></div>');}
   var fab=adminFab();if(fab)root.firstChild.insertAdjacentHTML('beforeend',fab);
   wireReplica();
   var sb=$('#rail-search');if(sb&&V.filterFocus){sb.focus();sb.setSelectionRange(sb.value.length,sb.value.length);}
