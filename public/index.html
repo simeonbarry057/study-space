@@ -909,6 +909,22 @@ function adminHtml(){
   }
   return h+'</div>';
 }
+function mdInline(t){return esc(t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');}
+function constHtml(){
+  if(A.cons===undefined){A.cons=null;window.__api('constitution',{}).then(function(r){A.cons=(r&&r.text)?r:{text:'Could not load the Constitution.'};if(V.route==='constitution')render();});}
+  var h='<div class="sheet"><div class="page-head"><span class="kicker">Admin</span><h1>Constitution</h1><p>The standing rules and Major Orders Claude follows, with what is pending or failed. Read-only here; tell Claude in chat to change it.</p></div>';
+  if(!A.cons)return h+'<p class="muted">Loading…</p></div>';
+  var L=A.cons.text.split('\n'),ul=0,ol=0;
+  function close(){var o='';if(ul){o+='</ul>';ul=0;}if(ol){o+='</ol>';ol=0;}return o;}
+  L.forEach(function(l){var m;
+    if(m=/^# (.*)/.exec(l)){return;}
+    if(m=/^## (.*)/.exec(l)){h+=close()+'<h2>'+mdInline(m[1])+'</h2>';return;}
+    if(m=/^\d+\. (.*)/.exec(l)){if(!ol){h+=close()+'<ol>';ol=1;}h+='<li>'+mdInline(m[1])+'</li>';return;}
+    if(m=/^- (.*)/.exec(l)){if(!ul){h+=close()+'<ul>';ul=1;}h+='<li>'+mdInline(m[1])+'</li>';return;}
+    if(l.trim()){h+=close()+'<p>'+mdInline(l)+'</p>';}});
+  h+=close()+'<p class="muted">'+(A.cons.at?'Last updated '+esc(new Date(A.cons.at).toLocaleString()):'Showing the version built into the site.')+'</p><p><a class="btn" href="#admin" data-link="1" style="text-decoration:none">Back to Access</a></p></div>';
+  return h;
+}
 function deniedHtml(){return '<div class="sheet"><div class="page-head"><span class="kicker">Admin</span><h1>Access denied</h1><p>This page is only for the site owner and admins. The owner has been alerted about this attempt.</p></div><p><a class="btn" href="#home" data-link="1" style="text-decoration:none">Back to the study desk</a></p></div>';}
 function logAlert(){
   if(A.alerted||!A.db||!A.id)return;A.alerted=true;
@@ -948,6 +964,7 @@ function mainHtml(){
   var r=V.route;
   if(r==='review')return reviewHtml();
   if(r==='admin'){if(A.isAdmin)return adminHtml();logAlert();return deniedHtml();}
+  if(r==='constitution'){if(!A.isAdmin)return deniedHtml();return constHtml();}
   if(r.indexOf('t-')===0&&TB[r.slice(2)]&&isLocked(r.slice(2)))return paywallHtml(TB[r.slice(2)]);
   if(r.indexOf('t-')===0&&TB[r.slice(2)]){var t=TB[r.slice(2)];return V.tab==='lab'?labHtml(t):V.tab==='quiz'?quizHome(t):V.tab==='notes'?notesHtml(t):lessonHtml(t);}
   if(r==='ccna')return ccnaHtml();
@@ -967,7 +984,7 @@ var ICO={
 function pendingCount(){return A.requests.filter(function(r){return r.status==='pending';}).length;}
 function topbarHtml(bare){
   var cs=curSubject(),dk=effDark(),pc=pendingCount();
-  var acct='<details class="acct"><summary aria-label="Account menu"><span class="avatar">'+ICO.user+'</span><span class="acct-name">Account</span><span class="caret" aria-hidden="true">▾</span></summary><div class="acct-menu"><p class="muted">'+(A.email?'Signed in as '+esc(A.email):'Signed in')+'</p><a href="#account" data-link="1">Account settings</a><a href="#review" data-link="1">Mistake review ('+Object.keys(S.mistakes).length+')</a>'+(A.isAdmin?'<a href="#admin" data-link="1">Manage access'+(pc?' <span class="badge">'+pc+'</span>':'')+'</a>':'')+'<button class="signout" data-act="signout">Sign out</button></div></details>';
+  var acct='<details class="acct"><summary aria-label="Account menu"><span class="avatar">'+ICO.user+'</span><span class="acct-name">Account</span><span class="caret" aria-hidden="true">▾</span></summary><div class="acct-menu"><p class="muted">'+(A.email?'Signed in as '+esc(A.email):'Signed in')+'</p><a href="#account" data-link="1">Account settings</a><a href="#review" data-link="1">Mistake review ('+Object.keys(S.mistakes).length+')</a>'+(A.isAdmin?'<a href="#admin" data-link="1">Manage access'+(pc?' <span class="badge">'+pc+'</span>':'')+'</a><a href="#constitution" data-link="1">Constitution</a>':'')+'<button class="signout" data-act="signout">Sign out</button></div></details>';
   return '<header class="topbar">'+(bare?'':'<button class="btn menu-btn" data-act="rail" aria-label="Topics">☰ Topics</button>')+'<button class="brand" data-act="go" data-r="home" aria-label="Study Space home"><span class="brand-mark logo" aria-hidden="true">GdTH</span><span class="brand-text">Study Space</span></button><div class="subj" role="group" aria-label="Subject">'+['ccna','excel'].map(function(x){return '<button class="subj-tab" data-act="go" data-r="'+x+'" aria-pressed="'+(cs===x)+'">'+ICO[x]+'<span>'+SUBJ[x].name+'</span></button>';}).join('')+'</div><button class="pill-btn" data-act="dark" aria-pressed="'+dk+'">Dark mode</button><button class="pill-btn" data-act="rainbow" aria-pressed="'+(!!S.rainbow)+'">Rainbow font</button><span class="spacer"></span>'+acct+'</header>';
 }
 function barRow(label,ico,a,b,p){return '<div class="mini"><span class="mi">'+ICO[ico]+'</span><b>'+a+' / '+b+'</b><span class="ml">'+label+'</span><div class="bar"><i style="width:'+p+'%"></i></div><small>'+p+'%</small></div>';}
@@ -1000,7 +1017,7 @@ function accountHtml(){
     else h+='<p class="muted">The 5-digit code you wrote down when you signed up. Enter your password to see it again.</p><label class="sr" for="mc-pw">Your password</label><input id="mc-pw" type="password" autocomplete="current-password" placeholder="Your password" style="max-width:280px;margin-right:8px"> <button class="btn" data-act="showcode">Show my security code</button>';}
   h+='<h2>Your totals</h2><ul><li>CCNA score: '+credits()+' / '+TOTAL_CREDITS+'</li><li>Questions to review: '+Object.keys(S.mistakes).length+'</li></ul>';
   h+='<h2>Sign out</h2><p>Saves your progress to your account, clears the copy on this device and returns to the sign-in page. To sign out of your claude.ai account itself, use the account menu on claude.ai.</p><button class="btn" data-act="signout">Sign out</button>';
-  if(A.isAdmin)h+='<p><a class="btn" href="#admin" data-link="1" style="text-decoration:none">Manage access</a></p>';
+  if(A.isAdmin)h+='<p><a class="btn" href="#admin" data-link="1" style="text-decoration:none">Manage access</a> <a class="btn" href="#constitution" data-link="1" style="text-decoration:none">Constitution</a></p>';
   return h+'</div>';
 }
 
@@ -1115,7 +1132,7 @@ function lockModal(t){
   });
   var f=m.querySelector('[data-lm="free"]')||m.querySelector('[data-lm="close"]');if(f)f.focus();
 }
-function route(){var h=location.hash.slice(1)||'home';A.myCode=null;
+function route(){var h=location.hash.slice(1)||'home';A.myCode=null;A.cons=undefined;
   if(h.indexOf('t-')===0&&TB[h.slice(2)]&&isLocked(h.slice(2))){var back=V.okRoute||'home';history.replaceState(null,'','#'+back);lockModal(TB[h.slice(2)]);if(V.okRoute===undefined){V.okRoute='home';V.route='home';V.quiz=null;V.tab='lesson';render();}return;}
   var lm0=document.getElementById('lock-modal');if(lm0)lm0.remove();
   V.okRoute=h;V.route=h;V.quiz=null;V.rail=false;V.tab='lesson';if(h.indexOf('t-')===0&&TB[h.slice(2)]){var tt=TB[h.slice(2)],sb=subjOfTopic(tt);S.last=tt.id;S.subject=sb;S.lastBy[sb]=tt.id;save();}else if(h==='ccna'||h==='excel'){S.subject=h;save();}render();window.scrollTo({top:0});}

@@ -21,6 +21,7 @@ module.exports=async(req,res)=>{
     else if(a==='admin_users'&&req.method==='POST')out=await core.adminUsers(req);
     else if(a==='admin_reset_link'&&req.method==='POST')out=await core.adminResetLink(req);
     else if(a==='admin_otp'&&req.method==='POST')out=await core.adminOtp(req);
+    else if(a==='constitution'&&(req.method==='GET'||req.method==='POST'))out=await core.constitution(req);
     else if(a==='content'&&req.method==='GET')out=await core.content(req);
     else if(a==='me'&&req.method==='GET')out=await core.me(req);
     else if(a==='notify'&&req.method==='GET')out=await core.notify(req);
