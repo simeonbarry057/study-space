@@ -1050,6 +1050,7 @@ function lockModal(t){
 }
 function route(){var h=location.hash.slice(1)||'home';
   if(h.indexOf('t-')===0&&TB[h.slice(2)]&&isLocked(h.slice(2))){var back=V.okRoute||'home';history.replaceState(null,'','#'+back);lockModal(TB[h.slice(2)]);if(V.okRoute===undefined){V.okRoute='home';V.route='home';V.quiz=null;V.tab='lesson';render();}return;}
+  var lm0=document.getElementById('lock-modal');if(lm0)lm0.remove();
   V.okRoute=h;V.route=h;V.quiz=null;V.rail=false;V.tab='lesson';if(h.indexOf('t-')===0&&TB[h.slice(2)]){var tt=TB[h.slice(2)],sb=subjOfTopic(tt);S.last=tt.id;S.subject=sb;S.lastBy[sb]=tt.id;save();}else if(h==='ccna'||h==='excel'){S.subject=h;save();}render();window.scrollTo({top:0});}
 window.addEventListener('hashchange',route);
 
