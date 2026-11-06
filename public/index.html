@@ -686,6 +686,59 @@ html[data-layout="magazine"][data-theme="dark"] .replica-number{color:#d6336c}
 html[data-layout="magazine"][data-theme="dark"] .replica-art{background:#2a2140d9}
 html[data-layout="magazine"][data-theme="dark"] .acct-menu{background-color:#2a2140 !important}
 
+/* constitution reader layouts */
+.cv{--cok-bg:#e0f3e7;--cok:#1b7a43;--cw-bg:#fdf0d2;--cw:#8a5700;--cb-bg:#fbe3e1;--cb:#b3261e;--cp-bg:#e2ecfb;--cp:#2b5fb4}
+.cswitch,.cfilters{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 16px}
+.cswitch button,.cchip{font:600 .9rem var(--font-ui,inherit);border:1px solid var(--line);background:var(--surface,#fff);color:var(--fg);padding:8px 14px;border-radius:10px;cursor:pointer}
+.cswitch button[aria-pressed="true"],.cchip[aria-pressed="true"]{background:#2d438f;border-color:#2d438f;color:#fff}
+.cpill{display:inline-block;font:700 .7rem var(--font-ui,inherit);letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:99px;white-space:nowrap;flex:none}
+.cs-Pending,.cs-Unverified{background:var(--cw-bg);color:var(--cw)}.cs-Failed{background:var(--cb-bg);color:var(--cb)}.cs-Progress,.cs-Note{background:var(--cp-bg);color:var(--cp)}
+.ccard{background:var(--surface,#fff);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.ccard h2{margin-top:0}
+.ccard p{margin:0 0 8px}
+.cgrid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));margin:10px 0}
+.cglance{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.chead{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.chead h3{margin:0;font-size:1rem}
+.cstats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+.cstat{background:var(--surface,#fff);border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:100px}
+.cstat b{display:block;font-size:1.5rem}.cstat span{font-size:.8rem;color:var(--muted)}
+.cline{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--line)}.cline:last-child{border:0}
+.ctabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:14px}
+.ctabs button{font:600 .92rem var(--font-ui,inherit);background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:10px 12px;cursor:pointer;white-space:nowrap}
+.ctabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:#2d438f}
+.coutline{display:grid;grid-template-columns:200px minmax(0,1fr);gap:28px;align-items:start}
+.ctoc{position:sticky;top:90px;font-size:.92rem}
+.ctoc a{display:block;padding:6px 10px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none}
+.ctoc a:hover{color:var(--fg);border-left-color:#2d438f}
+.cdoc{max-width:700px}.cdoc section{margin-bottom:30px;scroll-margin-top:90px}
+.cscroll{overflow-x:auto}.clog{width:100%;border-collapse:collapse;font-size:.9rem}
+.clog th,.clog td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+.clog th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.clog td:first-child{white-space:nowrap;color:var(--muted)}
+.cswitch button:focus-visible,.cchip:focus-visible,.ctabs button:focus-visible{outline:3px solid #2d438f;outline-offset:2px}
+@media (max-width:760px){.coutline{grid-template-columns:1fr}.ctoc{position:static;display:flex;gap:6px;flex-wrap:wrap}.ctoc a{border:1px solid var(--line);border-radius:99px;padding:5px 12px}}
+
+/* medieval parchment for the Constitution page (same look in light and dark) */
+html body .sheet.cv{--fg:#3a2912;--muted:#6a5233;--line:#c7ae78;--surface:#f6ebcf;color:#3a2912;border:3px double #8a6a35 !important;border-radius:6px;padding:26px clamp(14px,4vw,34px);
+ background-color:#ecd9a8 !important;background:
+  radial-gradient(ellipse 60% 40% at 12% 8%,#c99a4a33,transparent 70%),radial-gradient(ellipse 50% 35% at 88% 30%,#9c6b2a2b,transparent 70%),
+  radial-gradient(ellipse 55% 40% at 20% 92%,#a8782e30,transparent 70%),radial-gradient(ellipse 45% 30% at 82% 88%,#8a5a2230,transparent 70%),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .12 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"),
+  linear-gradient(135deg,#f3e4bd,#ead7a6 50%,#e3cc93) !important;
+ box-shadow:inset 0 0 70px #7a501a55,inset 0 0 12px #5a3a1088,0 10px 28px #0004}
+html body .sheet.cv .page-head,html body .sheet.cv .page-head p,html body .sheet.cv .kicker,html body .sheet.cv h2,html body .sheet.cv h3,html body .sheet.cv p,html body .sheet.cv li,html body .sheet.cv td,html body .sheet.cv th,html body .sheet.cv .muted,html body .sheet.cv span{color:#3a2912}
+html body .sheet.cv .muted,html body .sheet.cv .page-head p{color:#6a5233}
+html body .sheet.cv h1,html body .sheet.cv h2,html body .sheet.cv h3{font-variant:small-caps;letter-spacing:.03em}
+html body .sheet.cv .ccard,html body .sheet.cv .cstat{background:#f8eed4b8;border:1px solid #b99a5e;box-shadow:inset 0 0 18px #a8782e22;border-radius:8px}
+html body .sheet.cv .cswitch button,html body .sheet.cv .cchip{background:#f8eed4;border-color:#b99a5e;color:#3a2912}
+html body .sheet.cv .cswitch button[aria-pressed="true"],html body .sheet.cv .cchip[aria-pressed="true"]{background:#6b2f1e;border-color:#6b2f1e;color:#f8eed4}
+html body .sheet.cv .ctabs button{color:#6a5233}html body .sheet.cv .ctabs button[aria-selected="true"]{color:#3a2912;border-bottom-color:#6b2f1e}
+html body .sheet.cv .cpill{color:inherit}
+html body .sheet.cv .cs-Pending,html body .sheet.cv .cs-Unverified{background:#f3d98f;color:#6b4300}html body .sheet.cv .cs-Failed{background:#efc2b8;color:#8a1d14}html body .sheet.cv .cs-Progress,html body .sheet.cv .cs-Note{background:#cfdcc2;color:#2f4a1f}
+html body .sheet.cv .btn{background:#f8eed4;color:#3a2912;border-color:#b99a5e}
+html body .sheet.cv .cstat b{color:#6b2f1e}
+
 
 body{margin:0}
 .authtabs{display:flex;gap:8px;margin:0 0 6px}
@@ -1072,19 +1125,56 @@ function adminHtml(){
   return h+'</div>';
 }
 function mdInline(t){return esc(t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');}
+var CV_VIEWS=[['glance','At a glance'],['tabs','Tabs'],['board','Board'],['outline','Outline']];
+function cParse(txt){var secs=[],cur=null;
+  String(txt||'').split('\n').forEach(function(l){var m;
+    if(/^# /.test(l))return;
+    if(m=/^##+ (.*)/.exec(l)){cur={title:m[1].trim(),items:[]};secs.push(cur);return;}
+    if(!cur||!l.trim())return;
+    if(m=/^\d+\. (.*)/.exec(l)){cur.items.push({k:'ol',t:m[1]});return;}
+    if(m=/^[-*] (.*)/.exec(l)){cur.items.push({k:'ul',t:m[1]});return;}
+    if(/^\|/.test(l)){if(/^\|[\s:|-]+\|?$/.test(l))return;cur.items.push({k:'tr',c:l.replace(/^\||\|$/g,'').split('|').map(function(x){return x.trim();})});return;}
+    cur.items.push({k:'p',t:l});});
+  return secs;}
+function cStat(t){var m=/^\*\*(PENDING|FAILED|NOT YET VERIFIED LIVE|NOTE)\b[^*]*\*\*[\s.:-]*(.*)$/.exec(t);if(m)return {s:{PENDING:'Pending',FAILED:'Failed','NOT YET VERIFIED LIVE':'Unverified',NOTE:'Note'}[m[1]],t:m[2]};
+  var n=/^PENDING\s*-\s*(.*)$/.exec(t);if(n)return {s:'Pending',t:n[1]};n=/^FAILED\s*-\s*(.*)$/.exec(t);if(n)return {s:'Failed',t:n[1]};n=/^NOT YET VERIFIED LIVE\s*-\s*(.*)$/.exec(t);if(n)return {s:'Unverified',t:n[1]};n=/^NOTE\s*-\s*(.*)$/.exec(t);if(n)return {s:'Note',t:n[1]};
+  return {s:'',t:t};}
+function cOrder(t){var m=/^\*\*(.+?)\*\*\s*(.*)$/.exec(t),ti=m?m[1]:'',body=m?m[2]:t,st='';
+  if(/\(?\bPENDING\b\)?/i.test(ti)&&/\(.*PENDING.*\)/i.test(ti))st='Pending';else if(/\(.*IN PROGRESS.*\)/i.test(ti))st='Progress';
+  ti=ti.replace(/\s*\((PENDING|IN PROGRESS)\)/i,'').replace(/[.\s]+$/,'');return {ti:ti,body:body,s:st};}
+var CV_LAB={Pending:'Pending',Failed:'Failed',Unverified:'Unverified',Note:'Note',Progress:'In progress'};
+function cPill(s){return s?'<span class="cpill cs-'+s+'">'+CV_LAB[s]+'</span>':'';}
+function cList(items,tag){return '<'+tag+' class="cread">'+items.map(function(i){return '<li>'+mdInline(i.t)+'</li>';}).join('')+'</'+tag+'>';}
+function cBody(sec,compact){var k=sec.title.toLowerCase(),it=sec.items,h='',i;
+  if(k==='major orders'&&compact){return '<div>'+it.filter(function(x){return x.k!=='p';}).map(function(x){var o=cOrder(x.t);return '<div class="cline">'+cPill(o.s)+'<span>'+mdInline(o.ti)+'</span></div>';}).join('')+'</div>';}
+  if(k==='major orders'){var intro=it.filter(function(x){return x.k==='p';});intro.forEach(function(x){h+='<p class="muted">'+mdInline(x.t)+'</p>';});
+    h+='<div class="cgrid">'+it.filter(function(x){return x.k!=='p';}).map(function(x){var o=cOrder(x.t);return '<article class="ccard"><div class="chead"><h3>'+mdInline(o.ti)+'</h3>'+cPill(o.s)+'</div><p class="muted">'+mdInline(o.body)+'</p></article>';}).join('')+'</div>';return h;}
+  if(k==='pending and failed'){it.forEach(function(x){if(x.k==='p'){h+='<p class="muted">'+mdInline(x.t)+'</p>';return;}var c=cStat(x.t);h+='<div class="cline">'+cPill(c.s)+'<span>'+mdInline(c.t)+'</span></div>';});return h;}
+  var trs=it.filter(function(x){return x.k==='tr';});
+  it.forEach(function(x){if(x.k==='p')h+='<p class="cread">'+mdInline(x.t)+'</p>';});
+  var ol=it.filter(function(x){return x.k==='ol';}),ul=it.filter(function(x){return x.k==='ul';});
+  if(ol.length)h+=cList(ol,'ol');if(ul.length)h+=cList(ul,'ul');
+  if(trs.length){var head=trs[0].c,rows=trs.slice(1);h+='<div class="cscroll"><table class="clog"><thead><tr>'+head.map(function(c){return '<th>'+mdInline(c)+'</th>';}).join('')+'</tr></thead><tbody>'+rows.slice().reverse().map(function(r){return '<tr>'+r.c.map(function(c){return '<td>'+mdInline(c)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
+  return h;}
+function cStats(secs){var mo=0,pf=0,fl=0,rl=0;secs.forEach(function(s){var k=s.title.toLowerCase();if(k==='rules')rl=s.items.length;if(k==='major orders')mo=s.items.filter(function(x){return x.k!=='p';}).length;if(k==='pending and failed')s.items.forEach(function(x){if(x.k==='p')return;var c=cStat(x.t);if(c.s==='Pending')pf++;if(c.s==='Failed'&&!/^none/i.test(c.t))fl++;});});
+  return '<div class="cstats"><div class="cstat"><b>'+rl+'</b><span>Rules</span></div><div class="cstat"><b>'+mo+'</b><span>Major Orders</span></div><div class="cstat"><b>'+pf+'</b><span>Pending</span></div><div class="cstat"><b>'+fl+'</b><span>Failed</span></div></div>';}
+function cSec(secs,key){return secs.filter(function(s){return s.title.toLowerCase()===key;})[0];}
 function constHtml(){
   if(A.cons===undefined){A.cons=null;window.__api('constitution',{}).then(function(r){A.cons=(r&&r.text)?r:{text:'Could not load the Constitution.'};if(V.route==='constitution')render();});}
-  var h='<div class="sheet"><div class="page-head"><span class="kicker">Admin</span><h1>Constitution</h1><p>The standing rules and Major Orders Claude follows, with what is pending or failed. Read-only here; tell Claude in chat to change it.</p></div>';
+  var h='<div class="sheet cv"><div class="page-head"><span class="kicker">Admin</span><h1>Constitution</h1><p>The standing rules and Major Orders Claude follows, with what is pending or failed. Read-only here; tell Claude in chat to change it.</p></div>';
   if(!A.cons)return h+'<p class="muted">Loading…</p></div>';
-  var L=A.cons.text.split('\n'),ul=0,ol=0;
-  function close(){var o='';if(ul){o+='</ul>';ul=0;}if(ol){o+='</ol>';ol=0;}return o;}
-  L.forEach(function(l){var m;
-    if(m=/^# (.*)/.exec(l)){return;}
-    if(m=/^## (.*)/.exec(l)){h+=close()+'<h2>'+mdInline(m[1])+'</h2>';return;}
-    if(m=/^\d+\. (.*)/.exec(l)){if(!ol){h+=close()+'<ol>';ol=1;}h+='<li>'+mdInline(m[1])+'</li>';return;}
-    if(m=/^- (.*)/.exec(l)){if(!ul){h+=close()+'<ul>';ul=1;}h+='<li>'+mdInline(m[1])+'</li>';return;}
-    if(l.trim()){h+=close()+'<p>'+mdInline(l)+'</p>';}});
-  h+=close()+'<p class="muted">'+(A.cons.at?'Last updated '+esc(new Date(A.cons.at).toLocaleString()):'Showing the version built into the site.')+'</p><p><a class="btn" href="#admin" data-link="1" style="text-decoration:none">Back to Access</a></p></div>';
+  var secs=cParse(A.cons.text),view=A.cview||(function(){var v=LS.get('ccna-cview');return /^(glance|tabs|board|outline)$/.test(v||'')?v:'glance';})();A.cview=view;
+  var tab=A.ctab&&cSec(secs,A.ctab.toLowerCase())?A.ctab:(secs[0]&&secs[0].title)||'';
+  h+='<div class="cswitch" role="group" aria-label="Reading layout">'+CV_VIEWS.map(function(v){return '<button type="button" data-act="cview" data-v="'+v[0]+'" aria-pressed="'+(view===v[0])+'">'+v[1]+'</button>';}).join('')+'</div>';
+  if(view==='glance'){h+=cStats(secs)+'<div class="cglance">'+secs.filter(function(s){return !/^(purpose|amendments|review log)$/i.test(s.title);}).map(function(s){return '<section class="ccard"><h2>'+mdInline(s.title)+'</h2>'+cBody(s,true)+'</section>';}).join('')+'</div>';}
+  else if(view==='tabs'){h+='<div class="ctabs" role="tablist">'+secs.map(function(s){return '<button type="button" role="tab" data-act="ctab" data-t="'+esc(s.title)+'" aria-selected="'+(s.title===tab)+'">'+esc(s.title)+'</button>';}).join('')+'</div>';var cs=cSec(secs,tab.toLowerCase());if(cs)h+='<section class="ccard"><h2>'+mdInline(cs.title)+'</h2>'+cBody(cs)+'</section>';}
+  else if(view==='board'){var f=A.cfilt||'All',mo=cSec(secs,'major orders');
+    h+=cStats(secs);
+    if(mo){var its=mo.items.filter(function(x){return x.k!=='p';}),sts=its.map(function(x){return cOrder(x.t);}),opts=['All','Pending','Progress'];
+      h+='<h2>Major Orders</h2><div class="cfilters" role="group" aria-label="Filter by status">'+opts.map(function(o){var n=o==='All'?sts.length:sts.filter(function(x){return x.s===o;}).length;return '<button type="button" class="cchip" data-act="cfilt" data-f="'+o+'" aria-pressed="'+(f===o)+'">'+(o==='All'?'All':CV_LAB[o])+' ('+n+')</button>';}).join('')+'</div><div class="cgrid">'+sts.filter(function(o){return f==='All'||o.s===f;}).map(function(o){return '<article class="ccard"><div class="chead"><h3>'+mdInline(o.ti)+'</h3>'+cPill(o.s)+'</div><p class="muted">'+mdInline(o.body)+'</p></article>';}).join('')+'</div>';}
+    ['rules','pending and failed','standing limits'].forEach(function(k){var s=cSec(secs,k);if(s)h+='<h2>'+mdInline(s.title)+'</h2><div class="ccard">'+cBody(s)+'</div>';});}
+  else{h+='<div class="coutline"><nav class="ctoc" aria-label="Sections">'+secs.map(function(s,i){return '<a href="#constitution" data-act="cjump" data-i="'+i+'">'+esc(s.title)+'</a>';}).join('')+'</nav><div class="cdoc">'+secs.map(function(s,i){return '<section id="csec-'+i+'"><h2>'+mdInline(s.title)+'</h2>'+cBody(s)+'</section>';}).join('')+'</div></div>';}
+  h+='<p class="muted">'+(A.cons.at?'Last updated '+esc(new Date(A.cons.at).toLocaleString()):'Showing the version built into the site.')+'</p><p><a class="btn" href="#admin" data-link="1" style="text-decoration:none">Back to Access</a></p></div>';
   return h;
 }
 function deniedHtml(){return '<div class="sheet"><div class="page-head"><span class="kicker">Admin</span><h1>Access denied</h1><p>This page is only for the site owner and admins. The owner has been alerted about this attempt.</p></div><p><a class="btn" href="#home" data-link="1" style="text-decoration:none">Back to the study desk</a></p></div>';}
@@ -1225,6 +1315,10 @@ document.addEventListener('click',function(e){
   if(act==='step'||act==='notes')return;
   if(act==='go'){V.quiz=null;V.rail=false;var r=el.getAttribute('data-r');if(location.hash.slice(1)===r){route();}else location.hash=r;return;}
   if(act==='rail'){V.rail=!V.rail;render();return;}
+  if(act==='cview'){A.cview=el.getAttribute('data-v');LS.set('ccna-cview',A.cview);render();window.scrollTo(0,0);return;}
+  if(act==='ctab'){A.ctab=el.getAttribute('data-t');render();return;}
+  if(act==='cfilt'){A.cfilt=el.getAttribute('data-f');render();return;}
+  if(act==='cjump'){e.preventDefault();var cj=document.getElementById('csec-'+el.getAttribute('data-i'));if(cj)cj.scrollIntoView({behavior:'smooth'});return;}
   if(act==='layout'){S.layout=el.getAttribute('data-v');applyLook();save();render();return;}
   if(act==='signout'){doSignOut();return;}
   if(act==='signin-again'){A.out=false;try{localStorage.removeItem('ccna-out');}catch(x){}progressLoaded=false;if(A.mode==='ok'){loadProgress().then(function(){location.hash='home';route();});}else render();return;}
