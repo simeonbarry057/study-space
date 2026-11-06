@@ -654,6 +654,38 @@ html[data-rainbow="on"] .story-scene .doodle>*:nth-child(5n){--c:#7a4bb8}
 .scene-grid .story-scene::before{content:counter(step);position:absolute;top:8px;left:10px;width:24px;height:24px;border-radius:50%;background:#2d438f;color:#fff;font:700 .8rem/24px var(--font-title);text-align:center;z-index:2}
 .scene-grid .story-scene figcaption{font-size:.95rem}
 
+/* magazine dark */
+:root:root[data-layout="magazine"][data-theme="dark"]{--font-ui:Georgia,'Times New Roman',serif;--font-hand:Georgia,'Times New Roman',serif}
+html[data-layout="magazine"][data-theme="dark"] body{background:linear-gradient(135deg,#1b1530,#2a1a3d 55%,#16203a) fixed;color:#f3ecff;font-family:Georgia,'Times New Roman',serif}
+html[data-layout="magazine"][data-theme="dark"] .topbar{background:transparent;border-bottom:1px solid #f3ecff22;font-family:Inter,system-ui,sans-serif}
+html[data-layout="magazine"][data-theme="dark"] body::before{background:transparent}
+html[data-layout="magazine"][data-theme="dark"] .rail{background:#2a214088;border:1px solid #f3ecff14;border-radius:16px;font-family:Inter,system-ui,sans-serif;color:#f3ecff}
+html[data-layout="magazine"][data-theme="dark"] .topic-btn{color:#f3ecff}
+html[data-layout="magazine"][data-theme="dark"] .sheet{background:transparent;border:0;box-shadow:none;color:#f3ecff;max-width:860px;margin-inline:auto;padding:30px 20px}
+html[data-layout="magazine"][data-theme="dark"] .sheet :is(p,li,span,label,td,th,small,strong,em,b,div){color:#f3ecff}
+html[data-layout="magazine"][data-theme="dark"] .sheet h1{font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.04;color:#f3ecff}
+html[data-layout="magazine"][data-theme="dark"] .sheet .kicker{color:#d6336c;font-family:Inter,system-ui,sans-serif;letter-spacing:.2em}
+html[data-layout="magazine"][data-theme="dark"] .sheet .page-head p{font-size:1.25rem;line-height:1.5;color:#d3c7ea}
+html[data-layout="magazine"][data-theme="dark"] .sheet :is(h2,h3){color:#f3ecff;font-weight:700}
+html[data-layout="magazine"][data-theme="dark"] .sheet h2{border-bottom:2px solid #d6336c;display:inline-block;padding-bottom:2px}
+html[data-layout="magazine"][data-theme="dark"] .sheet p,html[data-layout="magazine"][data-theme="dark"] .sheet li{font-size:1.1rem;line-height:1.75}
+html[data-layout="magazine"][data-theme="dark"] .sheet .page-head+*>p:first-of-type::first-letter,html[data-layout="magazine"][data-theme="dark"] .sheet .page-head+p::first-letter{font-size:3.4em;float:left;line-height:.85;padding-right:8px;color:#d6336c}
+html[data-layout="magazine"][data-theme="dark"] .sheet .btn{background:#2a2140;border-color:#f3ecff33;color:#f3ecff;font-family:Inter,system-ui,sans-serif}
+html[data-layout="magazine"][data-theme="dark"] .sheet .card,html[data-layout="magazine"][data-theme="dark"] .sheet details{background:#2a2140d9;border-radius:14px;box-shadow:0 8px 26px #0001}
+:root:root[data-layout="magazine"][data-theme="dark"]{--bg:#1a1428;--surface:#241c38;--surface-2:#2a2140;--fg:#f3ecff;--muted:#bfb0dc;--line:#f3ecff22;--glass:rgba(36,28,56,.78);--glass-strong:rgba(36,28,56,.9);--glass-edge:#ffffff22;--glass-shadow:0 8px 24px #f3ecff1f;--bub:#d6336c;color-scheme:dark}
+html[data-layout="magazine"][data-theme="dark"] .sheet .btn.good{background:#2f9a55;color:#fff;border-color:#2f9a55}
+html[data-layout="magazine"][data-theme="dark"] .sheet .btn.primary{background:#f3ecff;color:#fff}
+html[data-layout="magazine"][data-theme="dark"] .sheet h2{display:table;margin-top:18px}
+html[data-layout="magazine"][data-theme="dark"] .sheet .page-head+*>p:first-of-type::first-letter,html[data-layout="magazine"][data-theme="dark"] .sheet .page-head+p::first-letter{font-size:inherit;float:none;line-height:inherit;padding:0;color:inherit}
+html[data-layout="magazine"][data-theme="dark"] .topbar select.layout-sel{background:#2a2140;color:#f3ecff}
+html[data-layout="magazine"][data-theme="dark"] .replica-sheet{color:#f3ecff}
+html[data-layout="magazine"][data-theme="dark"] .replica-title h3{font-size:2rem!important}
+html[data-layout="magazine"][data-theme="dark"] .replica-sheet h4{display:table;border-bottom:2px solid #d6336c;padding-bottom:2px}
+html[data-layout="magazine"][data-theme="dark"] .replica-sheet p,html[data-layout="magazine"][data-theme="dark"] .replica-sheet li{font-size:1.1rem;line-height:1.75}
+html[data-layout="magazine"][data-theme="dark"] .replica-number{color:#d6336c}
+html[data-layout="magazine"][data-theme="dark"] .replica-art{background:#2a2140d9}
+html[data-layout="magazine"][data-theme="dark"] .acct-menu{background-color:#2a2140 !important}
+
 
 body{margin:0}
 .authtabs{display:flex;gap:8px;margin:0 0 6px}
@@ -786,7 +818,7 @@ var A={free:false,out:false,mode:'checking',isOwner:false,canEdit:false,isAdmin:
 var dbTimer=null,progressLoaded=false;
 try{A.out=LS.get('ccna-out')==='1';}catch(e){}
 function effDark(){return S.theme==='dark'||(S.theme!=='light'&&!!window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);}
-function applyLook(){var r=document.documentElement;r.dataset.layout=S.layout;r.dataset.rainbow=S.rainbow?'on':'off';if(S.layout==='terminal')r.dataset.theme='dark';else if(S.layout==='magazine')r.dataset.theme='light';else if(S.theme==='light'||S.theme==='dark')r.dataset.theme=S.theme;else r.removeAttribute('data-theme');}
+function applyLook(){var r=document.documentElement;r.dataset.layout=S.layout;r.dataset.rainbow=S.rainbow?'on':'off';if(S.layout==='terminal')r.dataset.theme='dark';else if(S.layout==='magazine')r.dataset.theme=S.theme==='dark'?'dark':'light';else if(S.theme==='light'||S.theme==='dark')r.dataset.theme=S.theme;else r.removeAttribute('data-theme');}
 function save(){if(A.out)return;LS.set('ccna-site-v1',JSON.stringify(S));LS.set('ccna-look',JSON.stringify({layout:S.layout,theme:S.theme,rainbow:S.rainbow}));if(A.db&&A.id&&progressLoaded){clearTimeout(dbTimer);dbTimer=setTimeout(function(){try{A.db.doc('data/users/'+A.id+'/progress').set({json:JSON.stringify(S),at:new Date().toISOString()}).catch(function(){});}catch(e){}},1500);}}
 function toast(m){A.toast=m;var el=$('#toast');if(el)el.remove();var d=document.createElement('div');d.className='toast';d.id='toast';d.setAttribute('role','status');d.textContent=m;document.body.appendChild(d);setTimeout(function(){d.remove();},2600);}
 
