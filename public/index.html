@@ -738,6 +738,8 @@ html body .sheet.cv .cpill{color:inherit}
 html body .sheet.cv .cs-Pending,html body .sheet.cv .cs-Unverified{background:#f3d98f;color:#6b4300}html body .sheet.cv .cs-Failed{background:#efc2b8;color:#8a1d14}html body .sheet.cv .cs-Progress,html body .sheet.cv .cs-Note{background:#cfdcc2;color:#2f4a1f}
 html body .sheet.cv .btn{background:#f8eed4;color:#3a2912;border-color:#b99a5e}
 html body .sheet.cv .cstat b{color:#6b2f1e}
+html body .sheet.cv .cstat.t-Pending{background:#f3d98f;border-color:#c9a24a}html body .sheet.cv .cstat.t-Pending b,html body .sheet.cv .cstat.t-Pending span{color:#6b4300}
+html body .sheet.cv .cstat.t-Failed{background:#efc2b8;border-color:#c0675a}html body .sheet.cv .cstat.t-Failed b,html body .sheet.cv .cstat.t-Failed span{color:#8a1d14}
 
 
 body{margin:0}
@@ -1157,7 +1159,7 @@ function cBody(sec,compact){var k=sec.title.toLowerCase(),it=sec.items,h='',i;
   if(trs.length){var head=trs[0].c,rows=trs.slice(1);h+='<div class="cscroll"><table class="clog"><thead><tr>'+head.map(function(c){return '<th>'+mdInline(c)+'</th>';}).join('')+'</tr></thead><tbody>'+rows.slice().reverse().map(function(r){return '<tr>'+r.c.map(function(c){return '<td>'+mdInline(c)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
   return h;}
 function cStats(secs){var mo=0,pf=0,fl=0,rl=0;secs.forEach(function(s){var k=s.title.toLowerCase();if(k==='rules')rl=s.items.length;if(k==='major orders')mo=s.items.filter(function(x){return x.k!=='p';}).length;if(k==='pending and failed')s.items.forEach(function(x){if(x.k==='p')return;var c=cStat(x.t);if(c.s==='Pending')pf++;if(c.s==='Failed'&&!/^none/i.test(c.t))fl++;});});
-  return '<div class="cstats"><div class="cstat"><b>'+rl+'</b><span>Rules</span></div><div class="cstat"><b>'+mo+'</b><span>Major Orders</span></div><div class="cstat"><b>'+pf+'</b><span>Pending</span></div><div class="cstat"><b>'+fl+'</b><span>Failed</span></div></div>';}
+  return '<div class="cstats"><div class="cstat"><b>'+rl+'</b><span>Rules</span></div><div class="cstat"><b>'+mo+'</b><span>Major Orders</span></div><div class="cstat t-Pending"><b>'+pf+'</b><span>Pending</span></div><div class="cstat t-Failed"><b>'+fl+'</b><span>Failed</span></div></div>';}
 function cSec(secs,key){return secs.filter(function(s){return s.title.toLowerCase()===key;})[0];}
 function constHtml(){
   if(A.cons===undefined){A.cons=null;window.__api('constitution',{}).then(function(r){A.cons=(r&&r.text)?r:{text:'Could not load the Constitution.'};if(V.route==='constitution')render();});}
