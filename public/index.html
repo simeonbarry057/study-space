@@ -487,6 +487,25 @@ html .fn-badge{font-size:.72rem;padding:4px 12px;letter-spacing:1.6px;border-wid
 }
 @media (min-width:861px) and (max-height:600px){html .free-note{display:none}}
 
+/* locked-lesson popup */
+.lock-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,2,8,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:lmFade .18s ease-out}
+.lm-card{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:22px 24px 20px;border-radius:24px;text-align:center;
+ background:linear-gradient(180deg,#4a0a1c 0%,#26040e 55%,#18030a 100%);border:3px solid #ff4766;
+ box-shadow:0 7px 0 #b3122f,0 13px 0 #5c0a19,0 24px 44px #ff1f4bbb,0 0 34px #ff1f4b88,inset 0 3px 0 #ffb3c1aa,inset 0 -10px 22px #ff1f4b55;animation:lmPop .22s cubic-bezier(.2,1.3,.4,1)}
+.lm-card h2{margin:14px 0 8px;font-size:clamp(1.3rem,3.6vw,1.8rem);line-height:1.2;font-weight:900;color:#fff0f3;text-shadow:1px 1px 0 #ff1f4b,2px 2px 0 #d10f33,3px 3px 0 #8c0f27,4px 5px 8px #000a}
+.lm-card h2 em{font-style:normal;color:#ffe08a;text-shadow:1px 1px 0 #ff8a1f,2px 2px 0 #c4570f,3px 3px 0 #7a320a,4px 5px 8px #000a}
+.lm-sub{margin:0 0 12px;color:#ffd5dc;font-weight:700;font-size:1rem}
+.lm-pay{margin:0 0 16px;padding:12px 14px;border-radius:16px;background:#00000055;border:2px dashed #ff4766;text-align:left}
+.lm-pay p{margin:6px 0;color:#ff5c7a;font-weight:800;text-shadow:0 0 8px #ff1f4bcc}
+.lm-pay strong{color:#fff}
+.lm-pay .blank{display:inline-block;min-width:130px;border-bottom:3px solid #ff4766;vertical-align:baseline}
+.lm-pay .lm-note{color:#ffb3c1;font-weight:600;font-size:.88rem;text-shadow:none}
+.lm-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.lm-btns .btn{background:#2b0711;color:#ffd5dc;border:2px solid #ff4766}
+@keyframes lmFade{from{opacity:0}to{opacity:1}}
+@keyframes lmPop{from{transform:scale(.88) translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.lock-modal,.lm-card{animation:none}}
+
 
 body{margin:0}
 .authtabs{display:flex;gap:8px;margin:0 0 6px}
@@ -1008,7 +1027,30 @@ function doSignOut(){
   done();
 }
 function adminSet(path,data){return A.db.doc(path).set(data);}
-function route(){var h=location.hash.slice(1)||'home';V.route=h;V.quiz=null;V.rail=false;V.tab='lesson';if(h.indexOf('t-')===0&&TB[h.slice(2)]){var tt=TB[h.slice(2)],sb=subjOfTopic(tt);S.last=tt.id;S.subject=sb;S.lastBy[sb]=tt.id;save();}else if(h==='ccna'||h==='excel'){S.subject=h;save();}render();window.scrollTo({top:0});}
+function lockModal(t){
+  var old=document.getElementById('lock-modal');if(old)old.remove();
+  var fid=subjOfTopic(t)==='excel'?'x-workbook-basics':'network-basics',ft=TB[fid]||TB['network-basics'];
+  var blank=function(v){return v?'<strong>'+esc(v)+'</strong>':'<span class="blank" aria-label="to be added">&nbsp;</span>';};
+  var m=document.createElement('div');m.id='lock-modal';m.className='lock-modal';
+  m.innerHTML='<div class="lm-card" role="dialog" aria-modal="true" aria-labelledby="lm-h"><span class="fn-badge">LOCKED LESSON</span>'
+   +'<h2 id="lm-h">Your first lesson, <em>'+esc(ft?ft.title:'the first lesson')+'</em>, is free</h2>'
+   +'<p class="lm-sub">To open <b>'+esc(t.title)+'</b> and the rest of the lessons, please make a payment.</p>'
+   +'<div class="lm-pay"><p><b>Pay via MMG to:</b> '+blank(MMG_NUMBER)+'</p><p><b>Or contact the administrator via:</b> '+blank(ADMIN_CONTACT)+'</p><p class="lm-note">Once your payment is confirmed the owner approves your account and every lesson opens, with no refresh needed.</p></div>'
+   +'<div class="lm-btns">'+(ft?'<button type="button" class="cta" data-lm="free" data-id="'+esc(ft.id)+'">Open my free lesson <span aria-hidden="true">›</span></button>':'')+'<button type="button" class="btn" data-lm="close">Close</button></div></div>';
+  document.body.appendChild(m);
+  var close=function(){m.remove();document.removeEventListener('keydown',kd);};
+  var kd=function(e){if(e.key==='Escape')close();};
+  document.addEventListener('keydown',kd);
+  m.addEventListener('click',function(e){
+    if(e.target===m){close();return;}
+    var b=e.target.closest('[data-lm]');if(!b)return;
+    close();if(b.getAttribute('data-lm')==='free')location.hash='#t-'+b.getAttribute('data-id');
+  });
+  var f=m.querySelector('[data-lm="free"]')||m.querySelector('[data-lm="close"]');if(f)f.focus();
+}
+function route(){var h=location.hash.slice(1)||'home';
+  if(h.indexOf('t-')===0&&TB[h.slice(2)]&&isLocked(h.slice(2))){var back=V.okRoute||'home';history.replaceState(null,'','#'+back);lockModal(TB[h.slice(2)]);if(V.okRoute===undefined){V.okRoute='home';V.route='home';V.quiz=null;V.tab='lesson';render();}return;}
+  V.okRoute=h;V.route=h;V.quiz=null;V.rail=false;V.tab='lesson';if(h.indexOf('t-')===0&&TB[h.slice(2)]){var tt=TB[h.slice(2)],sb=subjOfTopic(tt);S.last=tt.id;S.subject=sb;S.lastBy[sb]=tt.id;save();}else if(h==='ccna'||h==='excel'){S.subject=h;save();}render();window.scrollTo({top:0});}
 window.addEventListener('hashchange',route);
 
 /* ---------- access ---------- */
