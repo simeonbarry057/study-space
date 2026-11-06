@@ -506,6 +506,20 @@ html .fn-badge{font-size:.72rem;padding:4px 12px;letter-spacing:1.6px;border-wid
 @keyframes lmPop{from{transform:scale(.88) translateY(14px);opacity:0}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.lock-modal,.lm-card{animation:none}}
 
+/* full screen lesson button + reading mode */
+.fs-btn{position:absolute;top:10px;right:12px;z-index:6;display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;cursor:pointer;
+ font:800 .85rem/1 system-ui,sans-serif;color:#17306b;background:linear-gradient(180deg,#e9f7ff,#bfe6fb);border:2px solid #7cc4ec;
+ box-shadow:0 3px 0 #4a9cc8,0 6px 12px #0003,inset 0 2px 0 #fff;transition:transform .12s,box-shadow .12s}
+.fs-btn span{font-size:1.1rem;line-height:1}
+.fs-btn:hover{transform:translateY(-1px);box-shadow:0 4px 0 #4a9cc8,0 8px 14px #0003,inset 0 2px 0 #fff}
+.fs-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #4a9cc8,inset 0 2px 0 #fff}
+.fs-btn:focus-visible{outline:3px solid #ff9d2e;outline-offset:2px}
+@media (max-width:560px){.fs-btn b{display:none}.fs-btn{padding:8px 11px}}
+body.reading .topbar,body.reading .rail,body.reading .scrim,body.reading .admin-fab,body.reading .free-note,body.reading .menu-btn{display:none!important}
+body.reading .shell{grid-template-columns:minmax(0,1fr)!important;padding-block:12px 40px}
+body.reading .main{max-width:1100px;margin-inline:auto;width:100%}
+body.reading .sheet{min-height:calc(100vh - 24px)}
+
 
 body{margin:0}
 .authtabs{display:flex;gap:8px;margin:0 0 6px}
@@ -964,6 +978,29 @@ function accountHtml(){
   if(A.isAdmin)h+='<p><a class="btn" href="#admin" data-link="1" style="text-decoration:none">Manage access</a></p>';
   return h+'</div>';
 }
+
+/* ---------- full screen (reading mode) ---------- */
+function fsOn(){return document.body.classList.contains('reading');}
+function fsButton(){
+  var main=document.getElementById('main'),sh=main&&main.querySelector('.sheet');
+  if(!sh||V.route==='home'||V.route==='account'||V.route==='admin'||!V.route||V.route.indexOf('t-')!==0){if(fsOn())fsSet(false);return;}
+  var b=document.createElement('button');b.type='button';b.className='fs-btn';b.setAttribute('data-fs','1');
+  b.setAttribute('aria-label',fsOn()?'Exit full screen':'Full screen');b.title=fsOn()?'Exit full screen (Esc)':'Full screen';
+  b.innerHTML='<span aria-hidden="true">'+(fsOn()?'\u2715':'\u26F6')+'</span><b>'+(fsOn()?'Exit full screen':'Full screen')+'</b>';
+  sh.insertBefore(b,sh.firstChild);
+}
+function fsSet(on){
+  document.body.classList.toggle('reading',!!on);
+  var d=document.documentElement;
+  try{
+    if(on&&!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen().catch(function(){});
+    if(!on&&document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(function(){});
+  }catch(e){}
+  if(document.getElementById('app')&&A&&!A.out)render();
+}
+document.addEventListener('fullscreenchange',function(){if(!document.fullscreenElement&&fsOn()){document.body.classList.remove('reading');render();}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&fsOn()&&!document.fullscreenElement&&!document.getElementById('lock-modal')){fsSet(false);}});
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-fs]');if(b){e.preventDefault();fsSet(!fsOn());}});
 function render(){
   var root=$('#app');
   if(A.out||A.mode!=='ok'){root.innerHTML='<div class="app">'+gateHtml()+'</div>';return;}
@@ -972,6 +1009,7 @@ function render(){
   if(A.free){var fa=root.firstChild,tb0=fa.querySelector('.topbar');if(tb0)tb0.insertAdjacentHTML('afterend','<div class="free-note" role="note"><span class="fn-badge">FREE ACCOUNT</span><span class="fn-text">Your first lesson is open. Other lessons need a payment, and the owner approves you once it is confirmed.</span></div>');}
   var fab=adminFab();if(fab)root.firstChild.insertAdjacentHTML('beforeend',fab);
   wireReplica();
+  fsButton();
   var sb=$('#rail-search');if(sb&&V.filterFocus){sb.focus();sb.setSelectionRange(sb.value.length,sb.value.length);}
 }
 
