@@ -190,7 +190,7 @@ html[data-layout="workspace"] .sheet .steps{margin:10px 0}
 .story-arrowhead{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .story-lan-boundary{fill:none;stroke:var(--ink);stroke-width:2.2px;stroke-dasharray:8 7;vector-effect:non-scaling-stroke}
 .story-scene figcaption{color:var(--ink);font:1.08rem/1.3 var(--font-hand);text-align:center;margin-top:6px}
-.scene-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px;margin:12px 0}
+.scene-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),310px));justify-content:start;gap:16px;margin:12px 0;counter-reset:step}
 .scene-grid .story-scene{margin:0}
 @media(max-width:600px){.story-label{font-size:27px}.story-action{font-size:23px}.story-group{font-size:25px}.story-scene{padding:6px}}
 /* replica pages (topic 1) */
@@ -650,6 +650,10 @@ html[data-rainbow="on"] .story-scene .doodle>*:nth-child(5n+3){--c:#2f9a55}
 html[data-rainbow="on"] .story-scene .doodle>*:nth-child(5n+4){--c:#2f6fb5}
 html[data-rainbow="on"] .story-scene .doodle>*:nth-child(5n){--c:#7a4bb8}
 
+.scene-grid .story-scene{counter-increment:step;position:relative;padding:12px 10px 8px}
+.scene-grid .story-scene::before{content:counter(step);position:absolute;top:8px;left:10px;width:24px;height:24px;border-radius:50%;background:#2d438f;color:#fff;font:700 .8rem/24px var(--font-title);text-align:center;z-index:2}
+.scene-grid .story-scene figcaption{font-size:.95rem}
+
 
 body{margin:0}
 .authtabs{display:flex;gap:8px;margin:0 0 6px}
@@ -835,7 +839,7 @@ function scene(name){
   if(name==='wifi'){b=line(300,150,110,70,1,[34,16],36)+line(300,150,110,250,1,[34,16],36)+line(300,150,490,70,1,[34,16],36)+line(300,150,490,250,1,[34,16],36)+dev(300,150,'router','Access point',76)+'<path d="M262 86 Q300 52 338 86 M276 98 Q300 76 324 98" class="story-link"/>'+dev(110,70,'phone','',64)+dev(110,250,'laptop','',64)+dev(490,70,'tablet','',64)+dev(490,250,'console','',60);}
   if(name==='firewall'){b=dev(85,150,'laptop','Your PC',72)+dev(300,150,'firewall','Firewall',80)+dev(515,150,'cloud','Internet',84)+link('M138 150 L250 150','Allowed: HTTPS',192,122)+link('M352 150 L462 150')+link('M495 258 Q430 292 362 258','',0,0,{dash:1})+'<path d="M420 262 l20 20 M440 262 l-20 20" class="story-link"/><text class="story-action" x="330" y="318" text-anchor="middle">Blocked: unrequested traffic</text>';}
   if(name==='vlan'){b='<ellipse cx="115" cy="185" rx="105" ry="108" class="story-lan-boundary"/><ellipse cx="485" cy="185" rx="105" ry="108" class="story-lan-boundary"/><text class="story-group" x="115" y="48" text-anchor="middle">VLAN 10</text><text class="story-group" x="485" y="48" text-anchor="middle">VLAN 20</text>'+line(300,185,115,130,0,[46,13],30)+line(300,185,115,240,0,[46,13],30)+line(300,185,485,130,0,[46,13],30)+line(300,185,485,240,0,[46,13],30)+dev(115,130,'monitor','',56)+dev(115,240,'monitor','',56)+dev(485,130,'monitor','',56)+dev(485,240,'monitor','',56)+dev(300,185,'switch','Switch',92);b=b.replace('<text class="story-label" y="66"','<text class="story-label" y="60"');}
-  return '<figure class="story-scene" aria-label="'+esc(TITLES[name])+'"><svg viewBox="0 0 600 330" role="img" aria-label="'+esc(TITLES[name])+'" style="--rbu:url(#gu'+id+');--rbb:url(#gb'+id+')"><defs><linearGradient id="gu'+id+'" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="600" y2="0">'+RBSTOPS+'</linearGradient><linearGradient id="gb'+id+'" x1="0" y1="0" x2="1" y2="1">'+RBSTOPS+'</linearGradient><marker id="'+id+'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1 L8 5 L1 9" class="story-arrowhead"/></marker><filter id="rf'+id+'" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G"/></filter></defs><g class="doodle" filter="url(#rf'+id+')">'+b+'</g></svg><figcaption>'+esc(TITLES[name])+'</figcaption></figure>';
+  return '<figure class="story-scene" aria-label="'+esc(TITLES[name])+'"><svg viewBox="0 0 600 330" role="img" aria-label="'+esc(TITLES[name])+'" style="--rbu:url(#gu'+id+');--rbb:url(#gb'+id+')"><defs><linearGradient id="gu'+id+'" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="600" y2="0">'+RBSTOPS+'</linearGradient><linearGradient id="gb'+id+'" x1="0" y1="0" x2="1" y2="1">'+RBSTOPS+'</linearGradient><marker id="'+id+'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1 L8 5 L1 9" class="story-arrowhead"/></marker></defs><g class="doodle">'+b+'</g></svg><figcaption>'+esc(TITLES[name])+'</figcaption></figure>';
 }
 var SCENES={'network-basics':['join','lan','exit','unknown','isp','internet','request','reply'],routers:['exit','unknown','isp','internet'],'clients-servers':['request','reply'],switches:['switch'],'firewalls-basics':['firewall'],wireless:['wifi'],vlans:['vlan']};
 
