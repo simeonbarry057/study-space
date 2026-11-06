@@ -740,6 +740,8 @@ html body .sheet.cv .btn{background:#f8eed4;color:#3a2912;border-color:#b99a5e}
 html body .sheet.cv .cstat b{color:#6b2f1e}
 html body .sheet.cv .cstat.t-Pending{background:#f3d98f;border-color:#c9a24a}html body .sheet.cv .cstat.t-Pending b,html body .sheet.cv .cstat.t-Pending span{color:#6b4300}
 html body .sheet.cv .cstat.t-Failed{background:#efc2b8;border-color:#c0675a}html body .sheet.cv .cstat.t-Failed b,html body .sheet.cv .cstat.t-Failed span{color:#8a1d14}
+.ctn{display:inline-block;min-width:1.5em;text-align:center;font:700 .74rem var(--font-ui,inherit);padding:1px 7px;border-radius:99px;background:#0001;margin-left:4px}
+html body .sheet.cv .ctn{background:#e6cf96;color:#3a2912}html body .sheet.cv .ctn.tn-w{background:#f3d98f;color:#6b4300}
 
 
 body{margin:0}
@@ -1160,6 +1162,11 @@ function cBody(sec,compact){var k=sec.title.toLowerCase(),it=sec.items,h='',i;
   return h;}
 function cStats(secs){var mo=0,pf=0,fl=0,rl=0;secs.forEach(function(s){var k=s.title.toLowerCase();if(k==='rules')rl=s.items.length;if(k==='major orders')mo=s.items.filter(function(x){return x.k!=='p';}).length;if(k==='pending and failed')s.items.forEach(function(x){if(x.k==='p')return;var c=cStat(x.t);if(c.s==='Pending')pf++;if(c.s==='Failed'&&!/^none/i.test(c.t))fl++;});});
   return '<div class="cstats"><div class="cstat"><b>'+rl+'</b><span>Rules</span></div><div class="cstat"><b>'+mo+'</b><span>Major Orders</span></div><div class="cstat t-Pending"><b>'+pf+'</b><span>Pending</span></div><div class="cstat t-Failed"><b>'+fl+'</b><span>Failed</span></div></div>';}
+function cTn(s){var k=s.title.toLowerCase(),n=0,c='';if(k==='purpose'||k==='amendments')return '';
+  if(k==='pending and failed'){s.items.forEach(function(x){if(x.k==='p')return;var t=cStat(x.t);if(t.s==='Pending'||(t.s==='Failed'&&!/^none/i.test(t.t)))n++;});c=' tn-w';}
+  else if(k==='review log')n=Math.max(0,s.items.filter(function(x){return x.k==='tr';}).length-1);
+  else n=s.items.filter(function(x){return x.k==='ol'||x.k==='ul';}).length;
+  return ' <span class="ctn'+c+'">'+n+'</span>';}
 function cSec(secs,key){return secs.filter(function(s){return s.title.toLowerCase()===key;})[0];}
 function constHtml(){
   if(A.cons===undefined){A.cons=null;window.__api('constitution',{}).then(function(r){A.cons=(r&&r.text)?r:{text:'Could not load the Constitution.'};if(V.route==='constitution')render();});}
@@ -1169,7 +1176,7 @@ function constHtml(){
   var tab=A.ctab&&cSec(secs,A.ctab.toLowerCase())?A.ctab:(secs[0]&&secs[0].title)||'';
   h+='<div class="cswitch" role="group" aria-label="Reading layout">'+CV_VIEWS.map(function(v){return '<button type="button" data-act="cview" data-v="'+v[0]+'" aria-pressed="'+(view===v[0])+'">'+v[1]+'</button>';}).join('')+'</div>';
   if(view==='glance'){h+=cStats(secs)+'<div class="cglance">'+secs.filter(function(s){return !/^(purpose|amendments|review log)$/i.test(s.title);}).map(function(s){return '<section class="ccard"><h2>'+mdInline(s.title)+'</h2>'+cBody(s,true)+'</section>';}).join('')+'</div>';}
-  else if(view==='tabs'){h+='<div class="ctabs" role="tablist">'+secs.map(function(s){return '<button type="button" role="tab" data-act="ctab" data-t="'+esc(s.title)+'" aria-selected="'+(s.title===tab)+'">'+esc(s.title)+'</button>';}).join('')+'</div>';var cs=cSec(secs,tab.toLowerCase());if(cs)h+='<section class="ccard"><h2>'+mdInline(cs.title)+'</h2>'+cBody(cs)+'</section>';}
+  else if(view==='tabs'){h+='<div class="ctabs" role="tablist">'+secs.map(function(s){return '<button type="button" role="tab" data-act="ctab" data-t="'+esc(s.title)+'" aria-selected="'+(s.title===tab)+'">'+esc(s.title)+cTn(s)+'</button>';}).join('')+'</div>';var cs=cSec(secs,tab.toLowerCase());if(cs)h+='<section class="ccard"><h2>'+mdInline(cs.title)+'</h2>'+cBody(cs)+'</section>';}
   else if(view==='board'){var f=A.cfilt||'All',mo=cSec(secs,'major orders');
     h+=cStats(secs);
     if(mo){var its=mo.items.filter(function(x){return x.k!=='p';}),sts=its.map(function(x){return cOrder(x.t);}),opts=['All','Pending','Progress'];
