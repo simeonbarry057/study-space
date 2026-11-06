@@ -625,6 +625,21 @@ html[data-layout="magazine"] .replica-art{background:#ffffffb8}
 .acct-menu a:hover,.acct-menu button:hover{background-color:var(--surface-2) !important}
 html[data-layout="terminal"] .acct-menu{background-color:#0a0d12 !important}
 html[data-layout="magazine"] .acct-menu{background-color:#ffffff !important}
+/* ---- Rainbow font: headings, pictures and numbers ---- */
+html[data-rainbow="on"] :is(.sheet h2,.sheet h3,.replica-title h3,.replica-sheet h4,.desk h2,.page-head h1){font-family:var(--font-hand);background:linear-gradient(90deg,#c5222f 0%,#c4631b 22%,#5f7d12 46%,#1b8a4b 62%,#2766b3 82%,#6b3fb8 100%);-webkit-background-clip:text;background-clip:text;color:transparent !important;-webkit-text-fill-color:transparent !important;width:fit-content;max-width:100%}
+html[data-rainbow="on"] .replica-sheet h4 span,html[data-rainbow="on"] .replica-title h3{-webkit-text-fill-color:transparent !important}
+html[data-rainbow="on"] .replica-number{border-color:#6b3fb8;color:#c5222f !important;-webkit-text-fill-color:#c5222f !important;background:none}
+html[data-rainbow="on"] .replica-art{position:relative}
+html[data-rainbow="on"] .replica-art img{opacity:0}
+html[data-rainbow="on"] .replica-art::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,#c5222f 0%,#c4631b 20%,#5f7d12 40%,#1b8a4b 58%,#2766b3 78%,#6b3fb8 100%);-webkit-mask-image:var(--ink-img);mask-image:var(--ink-img);-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+html[data-rainbow="on"] .replica-art{padding:10px}
+html[data-rainbow="on"] .replica-art::after{inset:10px}
+html[data-rainbow="on"] .story-scene .story-link{stroke:var(--rbu)}
+html[data-rainbow="on"] .story-scene .story-arrowhead{stroke:#6b3fb8}
+html[data-rainbow="on"] .story-scene :is(.story-label,.story-action,.story-group,.story-unknown){fill:var(--rbb)}
+html[data-rainbow="on"] .story-scene .sketch-device,html[data-rainbow="on"] .story-scene .sketch-device *{stroke:var(--rbb)}
+html[data-rainbow="on"] .story-scene .sketch-device circle[r="3"],html[data-rainbow="on"] .story-scene .sketch-device circle[r="3.5"],html[data-rainbow="on"] .story-scene .sketch-device circle[r="4"]{fill:var(--rbb)}
+html[data-rainbow="on"][data-layout="terminal"] .replica-art,html[data-rainbow="on"][data-layout="terminal"] .story-scene{background:#e9eaf3}
 
 
 body{margin:0}
@@ -792,6 +807,7 @@ var ICON={
 };
 var INK='';var sceneN=0;
 var TITLES={join:'Your phone joins your home network',lan:'These devices make up your home LAN',exit:'The router is the doorway out of your LAN',unknown:'Your router sends the request toward another network',isp:'Your router connects to your ISP’s network',internet:'Networks connect to other networks',request:'Your request travels toward the website server',reply:'The server sends information back to your phone',switch:'A switch connects every device on the LAN',firewall:'A firewall decides which traffic may pass',wifi:'An access point lets wireless devices join the LAN',vlan:'VLANs split one switch into separate networks'};
+var RBSTOPS='<stop offset="0" stop-color="#c5222f"/><stop offset=".22" stop-color="#c4631b"/><stop offset=".46" stop-color="#5f7d12"/><stop offset=".62" stop-color="#1b8a4b"/><stop offset=".82" stop-color="#2766b3"/><stop offset="1" stop-color="#6b3fb8"/>';
 function scene(name){
   var id='ar'+(++sceneN);
   function dev(x,y,kind,label,size){size=size||68;var h=size/2;return '<g transform="translate('+x+' '+y+')"><svg class="sketch-device" x="'+(-h)+'" y="'+(-h)+'" width="'+size+'" height="'+size+'" viewBox="0 0 100 100">'+ICON[kind]+'</svg>'+(label?'<text class="story-label" y="'+(h+20)+'" text-anchor="middle">'+esc(label)+'</text>':'')+'</g>';}
@@ -810,7 +826,7 @@ function scene(name){
   if(name==='wifi'){b=line(300,150,110,70,1,[34,16],36)+line(300,150,110,250,1,[34,16],36)+line(300,150,490,70,1,[34,16],36)+line(300,150,490,250,1,[34,16],36)+dev(300,150,'router','Access point',76)+'<path d="M262 86 Q300 52 338 86 M276 98 Q300 76 324 98" class="story-link"/>'+dev(110,70,'phone','',64)+dev(110,250,'laptop','',64)+dev(490,70,'tablet','',64)+dev(490,250,'console','',60);}
   if(name==='firewall'){b=dev(85,150,'laptop','Your PC',72)+dev(300,150,'firewall','Firewall',80)+dev(515,150,'cloud','Internet',84)+link('M138 150 L250 150','Allowed: HTTPS',192,122)+link('M352 150 L462 150')+link('M495 258 Q430 292 362 258','',0,0,{dash:1})+'<path d="M420 262 l20 20 M440 262 l-20 20" class="story-link"/><text class="story-action" x="330" y="318" text-anchor="middle">Blocked: unrequested traffic</text>';}
   if(name==='vlan'){b='<ellipse cx="115" cy="185" rx="105" ry="108" class="story-lan-boundary"/><ellipse cx="485" cy="185" rx="105" ry="108" class="story-lan-boundary"/><text class="story-group" x="115" y="48" text-anchor="middle">VLAN 10</text><text class="story-group" x="485" y="48" text-anchor="middle">VLAN 20</text>'+line(300,185,115,130,0,[46,13],30)+line(300,185,115,240,0,[46,13],30)+line(300,185,485,130,0,[46,13],30)+line(300,185,485,240,0,[46,13],30)+dev(115,130,'monitor','',56)+dev(115,240,'monitor','',56)+dev(485,130,'monitor','',56)+dev(485,240,'monitor','',56)+dev(300,185,'switch','Switch',92);b=b.replace('<text class="story-label" y="66"','<text class="story-label" y="60"');}
-  return '<figure class="story-scene" aria-label="'+esc(TITLES[name])+'"><svg viewBox="0 0 600 330" role="img" aria-label="'+esc(TITLES[name])+'"><defs><marker id="'+id+'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1 L8 5 L1 9" class="story-arrowhead"/></marker></defs>'+b+'</svg><figcaption>'+esc(TITLES[name])+'</figcaption></figure>';
+  return '<figure class="story-scene" aria-label="'+esc(TITLES[name])+'"><svg viewBox="0 0 600 330" role="img" aria-label="'+esc(TITLES[name])+'" style="--rbu:url(#gu'+id+');--rbb:url(#gb'+id+')"><defs><linearGradient id="gu'+id+'" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="600" y2="0">'+RBSTOPS+'</linearGradient><linearGradient id="gb'+id+'" x1="0" y1="0" x2="1" y2="1">'+RBSTOPS+'</linearGradient><marker id="'+id+'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1 L8 5 L1 9" class="story-arrowhead"/></marker></defs>'+b+'</svg><figcaption>'+esc(TITLES[name])+'</figcaption></figure>';
 }
 var SCENES={'network-basics':['join','lan','exit','unknown','isp','internet','request','reply'],routers:['exit','unknown','isp','internet'],'clients-servers':['request','reply'],switches:['switch'],'firewalls-basics':['firewall'],wireless:['wifi'],vlans:['vlan']};
 
@@ -819,7 +835,7 @@ var NT=[{n:'PAN',f:'Personal Area Network',p:["Connects devices within a very sm
 {n:'LAN',f:'Local Area Network',p:['Connects devices in a limited area (e.g. home, office, school, campus).','High speed and reliable.'],xl:'Examples',x:'Home network, office network, college lab network.',s:'Connects devices in a limited area (e.g. home, office, campus).',a:['lan',440,310]},
 {n:'MAN',f:'Metropolitan Area Network',p:['Covers a city or large urban area.','Connects multiple LANs together.','Usually provided by telecom companies or organizations.'],xl:'Example',x:'City-wide network, university network.',s:'Covers a city or large area.',a:['man',450,320]},
 {n:'WAN',f:'Wide Area Network',p:['Covers a country or the whole world.','Connects multiple MANs and LANs across long distances.','Uses public or private networks (e.g. Internet).'],xl:'Example',x:'Internet, global company network.',s:'Covers a country or the whole world.',a:['wan',440,330]}];
-function art(k,w,h,label){return '<figure class="replica-art" role="img" aria-label="'+esc(label)+'" style="aspect-ratio:'+w+'/'+h+'"><img src="'+ART[k]+'" alt="" aria-hidden="true" draggable="false" width="'+w+'" height="'+h+'"/></figure>';}
+function art(k,w,h,label){return '<figure class="replica-art" role="img" aria-label="'+esc(label)+'" style="aspect-ratio:'+w+'/'+h+';--ink-img:url('+ART[k]+')"><img src="'+ART[k]+'" alt="" aria-hidden="true" draggable="false" width="'+w+'" height="'+h+'"/></figure>';}
 var END='<footer class="replica-page-end" aria-hidden="true"><i class="replica-rule"></i><span>♥</span><i class="replica-rule"></i></footer>';
 function replica(){
   var h='<section class="replica-book" aria-label="Notebook: introduction and types of networks" id="replica-book">';
