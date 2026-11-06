@@ -527,6 +527,8 @@ body.reading .main{max-width:1100px;margin-inline:auto;width:100%}
 .cm-check input{width:20px;height:20px;accent-color:#ff4766}
 .lm-btns .cta[disabled]{opacity:.45;cursor:not-allowed;filter:grayscale(.5)}
 .code-input{letter-spacing:.5em;text-align:center;font-size:1.6rem;font-weight:800}
+.btn.subj{opacity:.55;font-weight:600}.btn.subj.on{opacity:1;background:#e3f6e8;border-color:#2e8b57;color:#14532d}
+body:has(.main.bare) .admin-row{max-width:none}
 
 
 body{margin:0}
@@ -871,27 +873,31 @@ function reviewHtml(){
 }
 function remaining(ms){if(ms<=0)return 'expired';var m=Math.floor(ms/60000),d=Math.floor(m/1440),hh=Math.floor((m%1440)/60);return d?d+'d '+hh+'h left':hh+'h '+(m%60)+'m left';}
 function roleOf(r){return r&&r.role==='admin'?'Admin':'Learner';}
-function isLocked(tid){return A.free&&!FREE_IDS[tid];}
+function subjOn(sb){return A.isOwner||!A.subjects||A.subjects.indexOf(sb)>=0;}
+function isLocked(tid){if(FREE_IDS[tid])return false;if(A.free)return true;var t=TB[tid];return !!t&&!subjOn(subjOfTopic(t));}
 function paywallHtml(t){
   var blank=function(v){return v?'<strong>'+esc(v)+'</strong>':'<span class="blank" aria-label="to be added">&nbsp;</span>';};
   return '<div class="sheet"><div class="page-head"><span class="kicker">Locked lesson</span><h1>'+esc(t?t.title:'This lesson')+'</h1><p>Your first lesson is free. To open the rest, please make a payment.</p></div>'
    +'<div class="paybox"><p><b>Pay via MMG to:</b> '+blank(MMG_NUMBER)+'</p><p><b>Or contact the administrator via:</b> '+blank(ADMIN_CONTACT)+'</p><p class="muted">Once your payment is confirmed the owner approves your account and every lesson opens, with no refresh needed.</p></div>'
    +'<p><a class="btn" href="#home" data-link="1" style="text-decoration:none">Back to the study desk</a></p></div>';
 }
+function subjList(r){return (r.subjects&&r.subjects.length)?r.subjects:['ccna','excel'];}
+function subjCell(r,O){var L=subjList(r);return ['ccna','excel'].map(function(k){var on=L.indexOf(k)>=0,nm=k==='ccna'?'CCNA':'Excel';
+  return O?'<button class="btn small subj'+(on?' on':'')+'" data-act="subj" data-id="'+esc(r.id)+'" data-s="'+k+'" aria-pressed="'+on+'" title="'+(on?'Click to remove ':'Click to give ')+nm+'">'+(on?'✓ ':'')+nm+'</button>':(on?'<span class="pill ok">'+nm+'</span> ':'');}).join(' ');}
 function adminHtml(){
   var O=A.isOwner,h='<div class="sheet"><div class="page-head"><span class="kicker">Admin</span><h1>Access</h1><p>'+(O?'Everyone who can use this site, what kind of access they have and for how long. Only you can approve, deny, revoke or change a role.':'Everyone who can use this site, what kind of access they have and for how long. You can look; only the owner can change access.')+'</p></div>';
   var pend=A.requests.filter(function(r){return r.status==='pending';}),den=A.requests.filter(function(r){return r.status==='denied';});
-  h+='<h2>Who has access ('+(A.approved.length+1)+')</h2><div class="tbl"><table><thead><tr><th>Person</th><th>Access</th><th>Time</th>'+(O?'<th></th>':'')+'</tr></thead><tbody>';
-  h+='<tr><td><strong>Owner</strong> <small class="muted">'+esc(O&&A.email?A.email:'simeonbarry057@gmail.com')+'</small></td><td><span class="pill ok">Owner</span> full control</td><td>Permanent</td>'+(O?'<td></td>':'')+'</tr>';
+  h+='<h2>Who has access ('+(A.approved.length+1)+')</h2><div class="tbl"><table><thead><tr><th>Person</th><th>Studying</th><th>Access</th><th>Time</th>'+(O?'<th></th>':'')+'</tr></thead><tbody>';
+  h+='<tr><td><strong>Owner</strong> <small class="muted">'+esc(O&&A.email?A.email:'simeonbarry057@gmail.com')+'</small></td><td><span class="pill ok">CCNA</span> <span class="pill ok">Excel</span></td><td><span class="pill ok">Owner</span> full control</td><td>Permanent</td>'+(O?'<td></td>':'')+'</tr>';
   A.approved.forEach(function(r){var exp=r.expiresAt?new Date(r.expiresAt).getTime():0,left=exp?remaining(exp-Date.now()):'No expiry',gone=exp&&exp<Date.now();
     var lu=(A.users||[]).filter(function(x){return x.id===r.id;})[0];
-    h+='<tr><td><strong>'+esc(r.name||'Unnamed')+'</strong>'+(lu&&lu.locked?' <span class="pill bad">Blocked</span>':'')+'<br><small class="muted">since '+esc(r.at?new Date(r.at).toLocaleDateString():'?')+'</small></td><td><span class="pill '+(r.role==='admin'?'warn':'')+'">'+roleOf(r)+'</span> '+(r.role==='admin'?'sees this page':'study content')+'</td><td>'+(gone?'<span class="pill bad">expired</span>':esc(left))+(exp?'<br><small class="muted">ends '+esc(new Date(exp).toLocaleDateString())+'</small>':'')+'</td>'
+    h+='<tr><td><strong>'+esc(r.name||'Unnamed')+'</strong>'+(lu&&lu.locked?' <span class="pill bad">Blocked</span>':'')+'<br><small class="muted">since '+esc(r.at?new Date(r.at).toLocaleDateString():'?')+'</small></td><td>'+subjCell(r,O)+'</td><td><span class="pill '+(r.role==='admin'?'warn':'')+'">'+roleOf(r)+'</span> '+(r.role==='admin'?'sees this page':'study content')+'</td><td>'+(gone?'<span class="pill bad">expired</span>':esc(left))+(exp?'<br><small class="muted">ends '+esc(new Date(exp).toLocaleDateString())+'</small>':'')+'</td>'
      +(O?'<td><div class="acts"><button class="btn small" data-act="role" data-id="'+esc(r.id)+'" data-role="'+(r.role==='admin'?'learner':'admin')+'">'+(r.role==='admin'?'Make learner':'Make admin')+'</button><button class="btn small danger" data-act="revoke" data-id="'+esc(r.id)+'">Revoke</button></div></td>':'')+'</tr>';});
   h+='</tbody></table></div><p class="muted">People you shared the page with from the Share menu are managed there, not here.</p>';
   if(O||A.canEdit){
     h+='<h2>Waiting ('+pend.length+')</h2>';
     if(!pend.length)h+='<p class="muted">No pending requests.</p>';
-    pend.forEach(function(r){h+='<div class="admin-row"><div><strong>'+esc(r.name||'Unnamed')+'</strong><br><small class="muted">asked '+esc(new Date(r.at).toLocaleString())+'</small></div>'+(O?'<div class="acts"><label class="sr" for="dur-'+esc(r.id)+'">Access length</label><select id="dur-'+esc(r.id)+'" class="btn small"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="0">No expiry</option></select><label class="sr" for="role-'+esc(r.id)+'">Role</label><select id="role-'+esc(r.id)+'" class="btn small"><option value="learner" selected>Learner</option><option value="admin">Admin</option></select><button class="btn small good" data-act="approve" data-id="'+esc(r.id)+'">Approve</button><button class="btn small danger" data-act="deny" data-id="'+esc(r.id)+'">Deny</button></div>':'')+'</div>';});
+    pend.forEach(function(r){h+='<div class="admin-row"><div><strong>'+esc(r.name||'Unnamed')+'</strong><br><small class="muted">asked '+esc(new Date(r.at).toLocaleString())+'</small></div>'+(O?'<div class="acts"><label class="sr" for="dur-'+esc(r.id)+'">Access length</label><select id="dur-'+esc(r.id)+'" class="btn small"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="0">No expiry</option></select><label class="sr" for="role-'+esc(r.id)+'">Role</label><select id="role-'+esc(r.id)+'" class="btn small"><option value="learner" selected>Learner</option><option value="admin">Admin</option></select><label class="sr" for="sub-'+esc(r.id)+'">Subjects</label><select id="sub-'+esc(r.id)+'" class="btn small"><option value="both" selected>CCNA + Excel</option><option value="ccna">CCNA only</option><option value="excel">Excel only</option></select><button class="btn small good" data-act="approve" data-id="'+esc(r.id)+'">Approve</button><button class="btn small danger" data-act="deny" data-id="'+esc(r.id)+'">Deny</button></div>':'')+'</div>';});
     if(den.length){h+='<h2>Denied ('+den.length+')</h2>';den.forEach(function(r){h+='<div class="admin-row"><div><strong>'+esc(r.name||'Unnamed')+'</strong></div>'+(O?'<div class="acts"><button class="btn small" data-act="approve" data-id="'+esc(r.id)+'">Approve instead</button><button class="btn small danger" data-act="remove-req" data-id="'+esc(r.id)+'">Remove</button></div>':'')+'</div>';});}
     h+='<h2>Blocked admin attempts ('+A.alerts.length+')</h2>';
     if(!A.alerts.length)h+='<p class="muted">Nobody has tried the admin page without permission.</p>';
@@ -1046,7 +1052,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 function render(){
   var root=$('#app');
   if(A.out||A.mode!=='ok'){root.innerHTML='<div class="app">'+gateHtml()+'</div>';return;}
-  var bare=!V.quiz&&(V.route==='home'||V.route==='account'||!V.route);
+  var bare=!V.quiz&&(V.route==='home'||V.route==='account'||V.route==='admin'||V.route==='constitution'||!V.route);
   root.innerHTML='<div class="app">'+topbarHtml(bare)+(bare?'<main class="main bare" id="main">'+mainHtml()+'</main>':'<div class="shell"><nav class="rail'+(V.rail?' open':'')+'" aria-label="Topics">'+railHtml()+'</nav>'+(V.rail?'<div class="scrim" data-act="rail"></div>':'')+'<main class="main" id="main">'+mainHtml()+'</main></div>')+'</div>';
   if(A.free){var fa=root.firstChild,tb0=fa.querySelector('.topbar');if(tb0)tb0.insertAdjacentHTML('afterend','<div class="free-note" role="note"><span class="fn-badge">FREE ACCOUNT</span><span class="fn-text">Your first lesson is open. Other lessons need a payment, and the owner approves you once it is confirmed.</span></div>');}
   var fab=adminFab();if(fab)root.firstChild.insertAdjacentHTML('beforeend',fab);
@@ -1087,7 +1093,8 @@ document.addEventListener('click',function(e){
   if(act==='showcode'&&window.__api){var pw0=$('#mc-pw');window.__api('mycode',{password:pw0?pw0.value:''}).then(function(r){if(r.code){A.myCode=r.code;render();}else if(r.none)toast('You do not have a security code yet. Contact the administrator.');else toast(r.error||'Could not show the code.');});return;}
   if(act==='request'){doRequest();return;}
   if(A.isOwner){var id=el.getAttribute('data-id');
-    if(act==='approve'){var sel=$('#dur-'+id),days=sel?+sel.value:30,r=A.requests.filter(function(x){return x.id===id;})[0]||{name:''};adminSet('approved/'+id,{name:r.name||'',at:new Date().toISOString(),role:($('#role-'+id)&&$('#role-'+id).value==='admin')?'admin':'learner',expiresAt:days?new Date(Date.now()+days*864e5).toISOString():null}).then(function(){return A.db.doc('requests/'+id).delete();}).then(function(){toast('Approved');}).catch(function(){toast('Could not approve. Try again.');});return;}
+    if(act==='approve'){var sel=$('#dur-'+id),days=sel?+sel.value:30,r=A.requests.filter(function(x){return x.id===id;})[0]||{name:''};adminSet('approved/'+id,{name:r.name||'',at:new Date().toISOString(),role:($('#role-'+id)&&$('#role-'+id).value==='admin')?'admin':'learner',subjects:(function(){var v=$('#sub-'+id)?$('#sub-'+id).value:'both';return v==='ccna'?['ccna']:v==='excel'?['excel']:['ccna','excel'];})(),expiresAt:days?new Date(Date.now()+days*864e5).toISOString():null}).then(function(){return A.db.doc('requests/'+id).delete();}).then(function(){toast('Approved');}).catch(function(){toast('Could not approve. Try again.');});return;}
+    if(act==='subj'){var rr=A.approved.filter(function(x){return x.id===id;})[0];if(!rr)return;var k=el.getAttribute('data-s'),L=subjList(rr).slice(),i=L.indexOf(k);if(i>=0){if(L.length===1){toast('Keep at least one subject.');return;}L.splice(i,1);}else L.push(k);A.db.doc('approved/'+id).update({subjects:L}).then(function(){toast('Subjects updated');}).catch(function(){toast('Could not change subjects.');});return;}
     if(act==='role'){A.db.doc('approved/'+id).update({role:el.getAttribute('data-role')==='admin'?'admin':'learner'}).then(function(){toast('Role changed');}).catch(function(){toast('Could not change role.');});return;}
     if(act==='clear-alert'){A.db.doc('alerts/'+id).delete().catch(function(){toast('Could not clear.');});return;}
     if(act==='reset-link'&&window.__api){window.__api('admin_reset_link',{id:id}).then(function(r){if(r.url){A.secret={title:'Reset link for '+r.name,text:r.url,note:'Works once and lasts 2 hours. Send it to them yourself.'};render();}else toast(r.error||'Could not make a link.');});return;}
@@ -1117,9 +1124,9 @@ function lockModal(t){
   var blank=function(v){return v?'<strong>'+esc(v)+'</strong>':'<span class="blank" aria-label="to be added">&nbsp;</span>';};
   var m=document.createElement('div');m.id='lock-modal';m.className='lock-modal';
   m.innerHTML='<div class="lm-card" role="dialog" aria-modal="true" aria-labelledby="lm-h"><span class="fn-badge">LOCKED LESSON</span>'
-   +'<h2 id="lm-h">Your first lesson, <em>'+esc(ft?ft.title:'the first lesson')+'</em>, is free</h2>'
-   +'<p class="lm-sub">To open <b>'+esc(t.title)+'</b> and the rest of the lessons, please make a payment.</p>'
-   +'<div class="lm-pay"><p><b>Pay via MMG to:</b> '+blank(MMG_NUMBER)+'</p><p><b>Or contact the administrator via:</b> '+blank(ADMIN_CONTACT)+'</p><p class="lm-note">Once your payment is confirmed the owner approves your account and every lesson opens, with no refresh needed.</p></div>'
+   +(A.free?'<h2 id="lm-h">Your first lesson, <em>'+esc(ft?ft.title:'the first lesson')+'</em>, is free</h2>':'<h2 id="lm-h">Not included in your account</h2>')
+   +(A.free?'<p class="lm-sub">To open <b>'+esc(t.title)+'</b> and the rest of the lessons, please make a payment.</p>':'<p class="lm-sub"><b>'+esc(t.title)+'</b> is part of '+(subjOfTopic(t)==='excel'?'Excel':'CCNA')+', which is not included in your account. To add it, please contact the administrator.</p>')
+   +'<div class="lm-pay">'+(A.free?'<p><b>Pay via MMG to:</b> '+blank(MMG_NUMBER)+'</p><p><b>Or contact the administrator via:</b> '+blank(ADMIN_CONTACT)+'</p><p class="lm-note">Once your payment is confirmed the owner approves your account and every lesson opens, with no refresh needed.</p>':'<p><b>Contact the administrator via:</b> '+blank(ADMIN_CONTACT)+'</p>')+'</div>'
    +'<div class="lm-btns">'+(ft?'<button type="button" class="cta" data-lm="free" data-id="'+esc(ft.id)+'">Open my free lesson <span aria-hidden="true">›</span></button>':'')+'<button type="button" class="btn" data-lm="close">Close</button></div></div>';
   document.body.appendChild(m);
   var close=function(){m.remove();document.removeEventListener('keydown',kd);};
@@ -1147,7 +1154,7 @@ var watchedAdmin=function(){};
 function evalAccess(){
   var prev=A.mode,wasFree=A.free;A.free=false;
   if(A.isOwner)A.mode='ok';
-  else if(A.appDoc&&A.appDoc.exists){var d=A.appDoc.data()||{};A.mode=(d.expiresAt&&new Date(d.expiresAt).getTime()<Date.now())?'expired':'ok';var wasA=A.isAdmin;A.isAdmin=A.isOwner||A.canEdit||(A.mode==='ok'&&d.role==='admin');if(A.isAdmin&&!wasA)watchedAdmin();}
+  else if(A.appDoc&&A.appDoc.exists){var d=A.appDoc.data()||{};A.subjects=(d.subjects&&d.subjects.length)?d.subjects:null;A.mode=(d.expiresAt&&new Date(d.expiresAt).getTime()<Date.now())?'expired':'ok';var wasA=A.isAdmin;A.isAdmin=A.isOwner||A.canEdit||(A.mode==='ok'&&d.role==='admin');if(A.isAdmin&&!wasA)watchedAdmin();}
   else if(A.reqDoc&&A.reqDoc.exists){var s=(A.reqDoc.data()||{}).status;if(s==='denied'){A.mode='denied';}else{A.mode='ok';A.free=true;}}
   else A.mode='request';
   if(wasFree&&!A.free&&A.mode==='ok'&&window.__webLogout){location.reload();return;}
