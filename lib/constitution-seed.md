@@ -8,7 +8,7 @@ This constitution is the set of rules Claude follows when looking after the CCNA
 4. Every email Claude sends carries the Gmail label "GdTHat Claude Project" and is kept out of the main inbox.
 ## Major Orders
 Big, lasting commands for what the study site must do. Each review checks every one against the live site and reports it as Working, Pending or Broken.
-1. **Security code.** Sign-ups get a pop-up with a 5-digit security code and must confirm they wrote it down. Customers can view their code in Account settings after re-entering their password. Accounts created before this have no code.
+1. **Security code.** Sign-ups get a pop-up with a 5-digit security code and must confirm they wrote it down. Customers can view their code in Account settings after re-entering their password. Accounts created before this have no code. If a person reaches out, Simeon can generate a new code, which is emailed to them (and shown to Simeon), and he can view anyone's current code from the admin area in case they say they never received it.
 2. **Password reset by email.** Forgot password emails a link that asks for the 5-digit code, then a page to enter and re-enter a new password. A link works once for 1 hour.
 3. **Lockout.** After 5 wrong codes the account is locked and shows Blocked in the admin area, where Simeon can unlock it or issue a new code. Simeon is emailed when an account locks.
 4. **Expiry reminders.** Customers are emailed 10, 5 and 3 days before access ends and when it ends. Simeon is notified 3 days before and on the day, under the label GdTHat Exp Notices.
