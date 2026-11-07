@@ -14,7 +14,7 @@ Big, lasting commands for what the study site must do. Each review checks every 
 4. **Expiry reminders.** Customers are emailed 10, 5 and 3 days before access ends and when it ends. Simeon is notified 3 days before and on the day, under the label GdTHat Exp Notices.
 5. **Sign-up alerts.** Simeon is emailed immediately on every sign-up, under the label GdTHat Study Space: new sign-ups.
 6. **Free first lesson and locked lessons.** New sign-ups get the first lesson free; the rest stay locked on the server until approved. Clicking a locked lesson shows a pop-up naming the free lesson.
-7. **Admin-only notebook editing.** Only the owner and admins can edit the notebook pages.
+7. **Owner-only notebook editing.** Only the owner can edit the notebook pages. Admins and learners cannot.
 8. **Off-site backup.** All accounts, access records and progress are copied to Google Drive every day.
 9. **Payment path (PENDING).** MMG number and administrator contact are blank until Simeon supplies them.
 10. **Content improvement (IN PROGRESS).** Polish remaining lessons, write missing quiz questions, check exam-domain percentages, add a timed practice exam and cheat sheets, bring back the interactive Excel formula sheet.
