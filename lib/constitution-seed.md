@@ -35,7 +35,7 @@ Updated at every review. An item is removed only when confirmed working.
 - **PENDING** Tax and business registration: Simeon already has a GRA TIN. Still to do: confirm the business name registration, ask the GRA how education fees are treated for VAT (threshold about GY$15 million), and keep a payment log before charging.
 - **PENDING** Move off Vercel Hobby before charging learners (Hobby forbids commercial use).
 - **PENDING** Legal and records: helper/admin confidentiality agreement drafted and needs signing by each admin; keep learner records, signed agreements and policies in the Study Space Legal Pack.
-- **PENDING** Excel coverage: the Excel part has 2 lessons, 56 quiz questions and 30 practice tasks (CCNA has 25 topics and 700 questions). Add more Excel topics with quizzes, and a Microsoft and Excel non-affiliation notice is now shown beside the Cisco one.
+- **PENDING** Excel coverage: the Excel part now has 6 lessons, 168 quiz questions and 90 practice tasks, out of 12 planned topics. Still to write: lookups, charts, PivotTables, data validation and conditional formatting, Power Query, and a complete work project. Excel legal points are covered: Microsoft and Excel notice, own examples, Microsoft help pages cited as links only.
 - **PENDING** Self-host the site fonts so visitors' addresses are no longer sent to Google Fonts.
 ## Standing limits
 - Review emails go only to simeonbarry057@gmail.com, with the subject "CCNA Constitution Review". The only other people who may be emailed are the site's admins (from the adminEmails list), and only about sign-ups, requests, reviews and customer reminder copies; never codes, resets, locks, removal requests or the Constitution.
