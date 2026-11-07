@@ -746,6 +746,8 @@ html body .sheet.cv .ctn{background:#e6cf96;color:#3a2912}html body .sheet.cv .c
 .rs-box p{flex-basis:100%;margin:4px 0}
 .rs-box input[type=file],.rs-box select{max-width:100%;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface,#fff);color:var(--fg)}
 .btn.bad{background:#b3261e;color:#fff;border-color:#b3261e}
+.rate{display:flex;gap:4px;margin:4px 0 6px}.rate .star{font-size:1.8rem;line-height:1;background:none;border:0;cursor:pointer;color:#c9971c;padding:2px 4px}
+.stars{color:#c9971c;letter-spacing:1px}.fb-row p{white-space:pre-wrap}
 
 
 body{margin:0}
@@ -875,7 +877,7 @@ function freshS(){return {v:1,layout:'notebook',theme:'auto',rainbow:true,subjec
 function norm(){if(!S.read)S.read={};if(!S.lastBy)S.lastBy={};if(S.rainbow===undefined)S.rainbow=true;if(S.subject!=='excel')S.subject='ccna';}norm();
 var V={route:'home',tab:'lesson',quiz:null,rail:false,filter:''};
 var FREE_IDS={'network-basics':1,'x-workbook-basics':1},MMG_NUMBER='',ADMIN_CONTACT='';
-var A={free:false,out:false,mode:'checking',isOwner:false,canEdit:false,isAdmin:false,alerts:[],alerted:false,name:'',email:'',id:null,db:null,requests:[],approved:[],reqDoc:null,appDoc:null,toast:''};
+var A={free:false,out:false,mode:'checking',isOwner:false,canEdit:false,isAdmin:false,alerts:[],removals:[],removalById:{},feedback:[],fb:null,rmFor:null,alerted:false,name:'',email:'',id:null,db:null,requests:[],approved:[],reqDoc:null,appDoc:null,toast:''};
 var dbTimer=null,progressLoaded=false;
 try{A.out=LS.get('ccna-out')==='1';}catch(e){}
 function effDark(){return S.theme==='dark'||(S.theme!=='light'&&!!window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);}
@@ -1101,24 +1103,43 @@ function paywallHtml(t){
 function subjList(r){return (r.subjects&&r.subjects.length)?r.subjects:['ccna','excel'];}
 function subjCell(r,O){var L=subjList(r);return ['ccna','excel'].map(function(k){var on=L.indexOf(k)>=0,nm=k==='ccna'?'CCNA':'Excel';
   return O?'<button class="btn small subj'+(on?' on':'')+'" data-act="subj" data-id="'+esc(r.id)+'" data-s="'+k+'" aria-pressed="'+on+'" title="'+(on?'Click to remove ':'Click to give ')+nm+'">'+(on?'✓ ':'')+nm+'</button>':(on?'<span class="pill ok">'+nm+'</span> ':'');}).join(' ');}
+function rmCell(r){if(r.id===A.id)return '';if(A.removalById[r.id])return '<span class="pill warn">Removal requested</span>';
+  if(A.rmFor===r.id)return '<label class="sr" for="rm-reason">Why should they be removed?</label><input id="rm-reason" maxlength="300" placeholder="Why? (optional)" style="max-width:200px"><button class="btn small danger" data-act="rm-send" data-id="'+esc(r.id)+'">Send request</button><button class="btn small" data-act="rm-cancel">Cancel</button>';
+  return '<button class="btn small" data-act="rm-ask" data-id="'+esc(r.id)+'">Request removal</button>';}
+function stars(n){var o='';for(var i=1;i<=5;i++)o+=i<=n?'★':'☆';return o;}
+function feedbackList(){var L=A.feedback.slice().sort(function(a,b){return (b.at||'')<(a.at||'')?-1:1;});
+  var h='<h2>Reviews and requests ('+L.length+')</h2>';if(!L.length)return h+'<p class="muted">Nothing yet. People can send these from their account menu.</p>';
+  return h+L.slice(0,50).map(function(x){return '<div class="admin-row fb-row"><div><span class="pill '+(x.kind==='request'?'warn':'ok')+'">'+(x.kind==='request'?'Request':'Review')+'</span> <strong>'+esc(x.name||'Someone')+'</strong>'+(x.rating?' <span class="stars" aria-label="'+x.rating+' out of 5">'+stars(x.rating)+'</span>':'')+'<p style="margin:6px 0">'+esc(x.text||'')+'</p><small class="muted">'+esc(x.at?new Date(x.at).toLocaleString():'')+(x.email&&A.isOwner?' · '+esc(x.email):'')+'</small></div></div>';}).join('');}
+function feedbackHtml(){var f=A.fb||(A.fb={kind:'review',rating:0,sent:false,err:''});
+  var h='<div class="sheet"><div class="page-head"><span class="kicker">Account</span><h1>Reviews and requests</h1><p>Tell us how the site is working for you, or ask for something new. The owner and the admins read everything you send.</p></div>';
+  if(f.sent)return h+'<div class="secretbox" role="status"><b>Thank you.</b><p class="muted">Your '+(f.kind==='request'?'request':'review')+' was sent.</p></div><p><button class="btn" data-act="fb-again">Send another</button> <a class="btn" href="#home" data-link="1" style="text-decoration:none">Back to the study desk</a></p></div>';
+  h+='<div class="seg" role="group" aria-label="Type"><button data-act="fb-kind" data-v="review" aria-pressed="'+(f.kind==='review')+'">Leave a review</button><button data-act="fb-kind" data-v="request" aria-pressed="'+(f.kind==='request')+'">Make a request</button></div>';
+  if(f.kind==='review')h+='<p class="muted" style="margin-top:14px">Your rating</p><div class="rate" role="group" aria-label="Rating">'+[1,2,3,4,5].map(function(i){return '<button type="button" class="star'+(i<=f.rating?' on':'')+'" data-act="fb-star" data-v="'+i+'" aria-label="'+i+' star'+(i>1?'s':'')+'" aria-pressed="'+(i<=f.rating)+'">'+(i<=f.rating?'★':'☆')+'</button>';}).join('')+'</div>';
+  h+='<label for="fb-text" style="display:block;margin-top:14px;font-weight:600">'+(f.kind==='request'?'What would you like?':'What did you think?')+'</label><textarea id="fb-text" rows="6" maxlength="1500" style="width:100%;max-width:640px" placeholder="'+(f.kind==='request'?'For example: a lesson, a lab, a fix, a change to your access':'What is working and what is not')+'">'+esc(f.text||'')+'</textarea>';
+  if(f.err)h+='<p class="auth-err" role="alert">'+esc(f.err)+'</p>';
+  return h+'<p><button class="btn primary" data-act="fb-send">Send</button></p></div>';}
 function adminHtml(){
-  var O=A.isOwner,h='<div class="sheet"><div class="page-head"><span class="kicker">Admin</span><h1>Access</h1><p>'+(O?'Everyone who can use this site, what kind of access they have and for how long. Only you can approve, deny, revoke or change a role.':'Everyone who can use this site, what kind of access they have and for how long. You can look; only the owner can change access.')+'</p></div>';
+  var O=A.isOwner,M=A.isAdmin,h='<div class="sheet"><div class="page-head"><span class="kicker">'+(O?'Owner':'Admin')+'</span><h1>Access</h1><p>'+(O?'Everyone who can use this site, what kind of access they have and for how long. Only you can revoke access or make and remove admins. Admins can approve people and ask you to remove someone.':'Everyone who can use this site and what they can open. You can approve new people, give them subjects and extend their time. To remove someone, press Request removal and the owner decides.')+'</p></div>';
   var pend=A.requests.filter(function(r){return r.status==='pending';}),den=A.requests.filter(function(r){return r.status==='denied';});
-  h+='<h2>Who has access ('+(A.approved.length+1)+')</h2><div class="tbl"><table><thead><tr><th>Person</th><th>Studying</th><th>Access</th><th>Time</th>'+(O?'<th></th>':'')+'</tr></thead><tbody>';
-  h+='<tr><td><strong>Owner</strong> <small class="muted">'+esc(O&&A.email?A.email:'simeonbarry057@gmail.com')+'</small></td><td><span class="pill ok">CCNA</span> <span class="pill ok">Excel</span></td><td><span class="pill ok">Owner</span> full control</td><td>Permanent</td>'+(O?'<td></td>':'')+'</tr>';
+  h+='<h2>Who has access ('+(A.approved.length+1)+')</h2><div class="tbl"><table><thead><tr><th>Person</th><th>Studying</th><th>Access</th><th>Time</th>'+(M?'<th></th>':'')+'</tr></thead><tbody>';
+  h+='<tr><td><strong>Owner</strong> <small class="muted">'+esc(O&&A.email?A.email:'simeonbarry057@gmail.com')+'</small></td><td><span class="pill ok">CCNA</span> <span class="pill ok">Excel</span></td><td><span class="pill ok">Owner</span> full control</td><td>Permanent</td>'+(M?'<td></td>':'')+'</tr>';
   A.approved.forEach(function(r){var exp=r.expiresAt?new Date(r.expiresAt).getTime():0,left=exp?remaining(exp-Date.now()):'No expiry',gone=exp&&exp<Date.now();
     var lu=(A.users||[]).filter(function(x){return x.id===r.id;})[0];
-    h+='<tr><td><strong>'+esc(r.name||'Unnamed')+'</strong>'+(lu&&lu.locked?' <span class="pill bad">Blocked</span>':'')+'<br><small class="muted">since '+esc(r.at?new Date(r.at).toLocaleDateString():'?')+'</small></td><td>'+subjCell(r,O)+'</td><td><span class="pill '+(r.role==='admin'?'warn':'')+'">'+roleOf(r)+'</span> '+(r.role==='admin'?'sees this page':'study content')+'</td><td>'+(gone?'<span class="pill bad">expired</span>':esc(left))+(exp?'<br><small class="muted">ends '+esc(new Date(exp).toLocaleDateString())+'</small>':'')+'</td>'
-     +(O?'<td><div class="acts"><button class="btn small" data-act="role" data-id="'+esc(r.id)+'" data-role="'+(r.role==='admin'?'learner':'admin')+'">'+(r.role==='admin'?'Make learner':'Make admin')+'</button><button class="btn small danger" data-act="revoke" data-id="'+esc(r.id)+'">Revoke</button></div></td>':'')+'</tr>';});
+    h+='<tr><td><strong>'+esc(r.name||'Unnamed')+'</strong>'+(lu&&lu.locked?' <span class="pill bad">Blocked</span>':'')+(O&&A.removalById[r.id]?' <span class="pill warn">removal requested</span>':'')+'<br><small class="muted">since '+esc(r.at?new Date(r.at).toLocaleDateString():'?')+'</small></td><td>'+subjCell(r,M&&(O||r.role!=='admin'))+'</td><td><span class="pill '+(r.role==='admin'?'warn':'')+'">'+roleOf(r)+'</span> '+(r.role==='admin'?'sees this page':'study content')+'</td><td>'+(gone?'<span class="pill bad">expired</span>':esc(left))+(exp?'<br><small class="muted">ends '+esc(new Date(exp).toLocaleDateString())+'</small>':'')+'</td>'
+     +(O?'<td><div class="acts"><button class="btn small" data-act="role" data-id="'+esc(r.id)+'" data-role="'+(r.role==='admin'?'learner':'admin')+'">'+(r.role==='admin'?'Make learner':'Make admin')+'</button><button class="btn small danger" data-act="revoke" data-id="'+esc(r.id)+'">Revoke</button></div></td>':(M?'<td><div class="acts">'+rmCell(r)+'</div></td>':''))+'</tr>';});
   h+='</tbody></table></div><p class="muted">People you shared the page with from the Share menu are managed there, not here.</p>';
   if(O||A.canEdit){
     h+='<h2>Waiting ('+pend.length+')</h2>';
     if(!pend.length)h+='<p class="muted">No pending requests.</p>';
-    pend.forEach(function(r){h+='<div class="admin-row"><div><strong>'+esc(r.name||'Unnamed')+'</strong><br><small class="muted">asked '+esc(new Date(r.at).toLocaleString())+'</small></div>'+(O?'<div class="acts"><label class="sr" for="dur-'+esc(r.id)+'">Access length</label><select id="dur-'+esc(r.id)+'" class="btn small"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="0">No expiry</option></select><label class="sr" for="role-'+esc(r.id)+'">Role</label><select id="role-'+esc(r.id)+'" class="btn small"><option value="learner" selected>Learner</option><option value="admin">Admin</option></select><label class="sr" for="sub-'+esc(r.id)+'">Subjects</label><select id="sub-'+esc(r.id)+'" class="btn small"><option value="both" selected>CCNA + Excel</option><option value="ccna">CCNA only</option><option value="excel">Excel only</option></select><button class="btn small good" data-act="approve" data-id="'+esc(r.id)+'">Approve</button><button class="btn small danger" data-act="deny" data-id="'+esc(r.id)+'">Deny</button></div>':'')+'</div>';});
-    if(den.length){h+='<h2>Denied ('+den.length+')</h2>';den.forEach(function(r){h+='<div class="admin-row"><div><strong>'+esc(r.name||'Unnamed')+'</strong></div>'+(O?'<div class="acts"><button class="btn small" data-act="approve" data-id="'+esc(r.id)+'">Approve instead</button><button class="btn small danger" data-act="remove-req" data-id="'+esc(r.id)+'">Remove</button></div>':'')+'</div>';});}
-    h+='<h2>Blocked admin attempts ('+A.alerts.length+')</h2>';
+    pend.forEach(function(r){h+='<div class="admin-row"><div><strong>'+esc(r.name||'Unnamed')+'</strong><br><small class="muted">asked '+esc(new Date(r.at).toLocaleString())+'</small></div>'+(M?'<div class="acts"><label class="sr" for="dur-'+esc(r.id)+'">Access length</label><select id="dur-'+esc(r.id)+'" class="btn small"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="0">No expiry</option></select>'+(O?'<label class="sr" for="role-'+esc(r.id)+'">Role</label><select id="role-'+esc(r.id)+'" class="btn small"><option value="learner" selected>Learner</option><option value="admin">Admin</option></select>':'')+'<label class="sr" for="sub-'+esc(r.id)+'">Subjects</label><select id="sub-'+esc(r.id)+'" class="btn small"><option value="both" selected>CCNA + Excel</option><option value="ccna">CCNA only</option><option value="excel">Excel only</option></select><button class="btn small good" data-act="approve" data-id="'+esc(r.id)+'">Approve</button><button class="btn small danger" data-act="deny" data-id="'+esc(r.id)+'">Deny</button></div>':'')+'</div>';});
+    if(den.length){h+='<h2>Denied ('+den.length+')</h2>';den.forEach(function(r){h+='<div class="admin-row"><div><strong>'+esc(r.name||'Unnamed')+'</strong></div>'+(M?'<div class="acts"><button class="btn small" data-act="approve" data-id="'+esc(r.id)+'">Approve instead</button>'+(O?'<button class="btn small danger" data-act="remove-req" data-id="'+esc(r.id)+'">Remove</button>':'')+'</div>':'')+'</div>';});}
+    if(O){var rms=A.removals.filter(function(x){return A.approved.some(function(a){return a.id===x.id;});});
+      h+='<h2>Removal requests ('+rms.length+')</h2>';if(!rms.length)h+='<p class="muted">No admin has asked for anyone to be removed.</p>';
+      rms.forEach(function(x){h+='<div class="admin-row"><div><strong>'+esc(x.name||'Unnamed')+'</strong> <small class="muted">('+esc(x.role==='admin'?'admin':'learner')+')</small><br><small class="muted">asked by '+esc(x.byName||'an admin')+(x.at?' on '+esc(new Date(x.at).toLocaleString()):'')+(x.reason?' · '+esc(x.reason):'')+'</small></div><div class="acts"><button class="btn small danger" data-act="rm-approve" data-id="'+esc(x.id)+'">Remove their access</button><button class="btn small" data-act="rm-dismiss" data-id="'+esc(x.id)+'">Dismiss</button></div></div>';});}
+    if(O){h+='<h2>Blocked admin attempts ('+A.alerts.length+')</h2>';
     if(!A.alerts.length)h+='<p class="muted">Nobody has tried the admin page without permission.</p>';
-    A.alerts.slice().sort(function(a,b){return (b.at||'')<(a.at||'')?-1:1;}).forEach(function(r){h+='<div class="admin-row"><div><strong>'+esc(r.name||'Unknown')+'</strong><br><small class="muted">'+esc(r.count||1)+' attempt(s), last '+esc(r.at?new Date(r.at).toLocaleString():'?')+(r.notifiedAt?' · emailed':' · email pending')+'</small></div>'+(O?'<div class="acts"><button class="btn small" data-act="clear-alert" data-id="'+esc(r.id)+'">Clear</button></div>':'')+'</div>';});
+    A.alerts.slice().sort(function(a,b){return (b.at||'')<(a.at||'')?-1:1;}).forEach(function(r){h+='<div class="admin-row"><div><strong>'+esc(r.name||'Unknown')+'</strong><br><small class="muted">'+esc(r.count||1)+' attempt(s), last '+esc(r.at?new Date(r.at).toLocaleString():'?')+(r.notifiedAt?' · emailed':' · email pending')+'</small></div>'+(O?'<div class="acts"><button class="btn small" data-act="clear-alert" data-id="'+esc(r.id)+'">Clear</button></div>':'')+'</div>';});}
+    h+=feedbackList();
   }
   if(O&&window.__api){
     var now=Date.now();if(!A.usersAt||now-A.usersAt>15000){A.usersAt=now;window.__api('admin_users',{}).then(function(r){if(r&&r.users){A.users=r.users;if(V.route==='admin'&&A.mode==='ok'&&!document.activeElement.matches('input,select,textarea'))render();}});}
@@ -1233,8 +1254,9 @@ function mainHtml(){
   if(V.quiz)return quizHtml();
   var r=V.route;
   if(r==='review')return reviewHtml();
+  if(r==='feedback')return feedbackHtml();
   if(r==='admin'){if(A.isAdmin)return adminHtml();logAlert();return deniedHtml();}
-  if(r==='constitution'){if(!A.isAdmin)return deniedHtml();return constHtml();}
+  if(r==='constitution'){if(!A.isOwner)return deniedHtml();return constHtml();}
   if(r.indexOf('t-')===0&&TB[r.slice(2)]&&isLocked(r.slice(2)))return paywallHtml(TB[r.slice(2)]);
   if(r.indexOf('t-')===0&&TB[r.slice(2)]){var t=TB[r.slice(2)];return V.tab==='lab'?labHtml(t):V.tab==='quiz'?quizHome(t):V.tab==='notes'?notesHtml(t):lessonHtml(t);}
   if(r==='ccna')return ccnaHtml();
@@ -1254,7 +1276,7 @@ var ICO={
 function pendingCount(){return A.requests.filter(function(r){return r.status==='pending';}).length;}
 function topbarHtml(bare){
   var cs=curSubject(),dk=effDark(),pc=pendingCount();
-  var acct='<details class="acct"><summary aria-label="Account menu"><span class="avatar">'+ICO.user+'</span><span class="acct-name">Account</span><span class="caret" aria-hidden="true">▾</span></summary><div class="acct-menu"><p class="muted">'+(A.email?'Signed in as '+esc(A.email):'Signed in')+'</p><a href="#account" data-link="1">Account settings</a><a href="#review" data-link="1">Mistake review ('+Object.keys(S.mistakes).length+')</a>'+(A.isAdmin?'<a href="#admin" data-link="1">Manage access'+(pc?' <span class="badge">'+pc+'</span>':'')+'</a><a href="#constitution" data-link="1">Constitution</a>':'')+'<button class="signout" data-act="signout">Sign out</button></div></details>';
+  var acct='<details class="acct"><summary aria-label="Account menu"><span class="avatar">'+ICO.user+'</span><span class="acct-name">Account</span><span class="caret" aria-hidden="true">▾</span></summary><div class="acct-menu"><p class="muted">'+(A.email?'Signed in as '+esc(A.email):'Signed in')+'</p><a href="#account" data-link="1">Account settings</a><a href="#review" data-link="1">Mistake review ('+Object.keys(S.mistakes).length+')</a><a href="#feedback" data-link="1">Review or request</a>'+(A.isAdmin?'<a href="#admin" data-link="1">Manage access'+(pc?' <span class="badge">'+pc+'</span>':'')+'</a>':'')+(A.isOwner?'<a href="#constitution" data-link="1">Constitution</a>':'')+'<button class="signout" data-act="signout">Sign out</button></div></details>';
   return '<header class="topbar">'+(bare?'':'<button class="btn menu-btn" data-act="rail" aria-label="Topics">☰ Topics</button>')+'<button class="brand" data-act="go" data-r="home" aria-label="Study Space home"><span class="brand-mark logo" aria-hidden="true">GdTH</span><span class="brand-text">Study Space</span></button><div class="subj" role="group" aria-label="Subject">'+['ccna','excel'].map(function(x){return '<button class="subj-tab" data-act="go" data-r="'+x+'" aria-pressed="'+(cs===x)+'">'+ICO[x]+'<span>'+SUBJ[x].name+'</span></button>';}).join('')+'</div><button class="pill-btn" data-act="dark" aria-pressed="'+dk+'">Dark mode</button><button class="pill-btn" data-act="rainbow" aria-pressed="'+(!!S.rainbow)+'">Rainbow font</button><label class="sr" for="layout-sel">Layout</label><select id="layout-sel" class="pill-btn layout-sel" data-act="layout-sel" aria-label="Layout">'+[['notebook','Notebook'],['workspace','Workspace'],['terminal','Terminal'],['magazine','Magazine']].map(function(o){return '<option value="'+o[0]+'"'+(S.layout===o[0]?' selected':'')+'>Layout: '+o[1]+'</option>';}).join('')+'</select><span class="spacer"></span>'+acct+'</header>';
 }
 function barRow(label,ico,a,b,p){return '<div class="mini"><span class="mi">'+ICO[ico]+'</span><b>'+a+' / '+b+'</b><span class="ml">'+label+'</span><div class="bar"><i style="width:'+p+'%"></i></div><small>'+p+'%</small></div>';}
@@ -1287,7 +1309,7 @@ function accountHtml(){
     else h+='<p class="muted">The 5-digit code you wrote down when you signed up. Enter your password to see it again.</p><label class="sr" for="mc-pw">Your password</label><input id="mc-pw" type="password" autocomplete="current-password" placeholder="Your password" style="max-width:280px;margin-right:8px"> <button class="btn" data-act="showcode">Show my security code</button>';}
   h+='<h2>Your totals</h2><ul><li>CCNA score: '+credits()+' / '+TOTAL_CREDITS+'</li><li>Questions to review: '+Object.keys(S.mistakes).length+'</li></ul>';
   h+='<h2>Sign out</h2><p>Saves your progress to your account, clears the copy on this device and returns to the sign-in page. To sign out of your claude.ai account itself, use the account menu on claude.ai.</p><button class="btn" data-act="signout">Sign out</button>';
-  if(A.isAdmin)h+='<p><a class="btn" href="#admin" data-link="1" style="text-decoration:none">Manage access</a> <a class="btn" href="#constitution" data-link="1" style="text-decoration:none">Constitution</a></p>';
+  h+='<p><a class="btn" href="#feedback" data-link="1" style="text-decoration:none">Leave a review or request</a>'+(A.isAdmin?' <a class="btn" href="#admin" data-link="1" style="text-decoration:none">Manage access</a>':'')+(A.isOwner?' <a class="btn" href="#constitution" data-link="1" style="text-decoration:none">Constitution</a>':'')+'</p>';
   return h+'</div>';
 }
 
@@ -1316,7 +1338,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 function render(){
   var root=$('#app');
   if(A.out||A.mode!=='ok'){root.innerHTML='<div class="app">'+gateHtml()+'</div>';return;}
-  var bare=!V.quiz&&(V.route==='home'||V.route==='account'||V.route==='admin'||V.route==='constitution'||!V.route);
+  var bare=!V.quiz&&(V.route==='home'||V.route==='account'||V.route==='admin'||V.route==='constitution'||V.route==='feedback'||!V.route);
   root.innerHTML='<div class="app">'+topbarHtml(bare)+(bare?'<main class="main bare" id="main">'+mainHtml()+'</main>':'<div class="shell"><nav class="rail'+(V.rail?' open':'')+'" aria-label="Topics">'+railHtml()+'</nav>'+(V.rail?'<div class="scrim" data-act="rail"></div>':'')+'<main class="main" id="main">'+mainHtml()+'</main></div>')+'</div>';
   if(A.free){var fa=root.firstChild,tb0=fa.querySelector('.topbar');if(tb0)tb0.insertAdjacentHTML('afterend','<div class="free-note" role="note"><span class="fn-badge">FREE ACCOUNT</span><span class="fn-text">Your first lesson is open. Other lessons need a payment, and the owner approves you once it is confirmed.</span></div>');}
   var fab=adminFab();if(fab)root.firstChild.insertAdjacentHTML('beforeend',fab);
@@ -1360,7 +1382,13 @@ document.addEventListener('click',function(e){
   if(act==='hidecode'){A.myCode=null;render();return;}
   if(act==='showcode'&&window.__api){var pw0=$('#mc-pw');window.__api('mycode',{password:pw0?pw0.value:''}).then(function(r){if(r.code){A.myCode=r.code;render();}else if(r.none)toast('You do not have a security code yet. Contact the administrator.');else toast(r.error||'Could not show the code.');});return;}
   if(act==='request'){doRequest();return;}
-  if(A.isOwner){var id=el.getAttribute('data-id');
+  if(act==='fb-again'){A.fb=null;render();return;}
+  if(act==='fb-send'){var f=A.fb||(A.fb={kind:'review',rating:0}),ta2=$('#fb-text');f.text=ta2?ta2.value:(f.text||'');f.err='';
+    if(f.text.trim().length<5){f.err='Please write a little more.';render();return;}
+    window.__api('feedback',{kind:f.kind,text:f.text,rating:f.rating}).then(function(r){if(r&&r.ok){f.sent=true;f.text='';}else f.err=(r&&r.error)||'Could not send. Try again.';render();});return;}
+  if(act==='fb-kind'||act==='fb-star'){var ta=$('#fb-text');if(!A.fb)A.fb={kind:'review',rating:0};if(ta)A.fb.text=ta.value;if(act==='fb-kind')A.fb.kind=el.getAttribute('data-v');else A.fb.rating=+el.getAttribute('data-v');render();return;}
+  if(A.isOwner||A.isAdmin){var id=el.getAttribute('data-id');
+    if(!A.isOwner&&/^(role|unlock|newcode|revoke|viewcode|otp|reset-link|remove-req|clear-alert|rm-approve|rm-dismiss|rs-.*|copy-secret)$/.test(act))return;
     if(act==='approve'){var sel=$('#dur-'+id),days=sel?+sel.value:30,r=A.requests.filter(function(x){return x.id===id;})[0]||{name:''};adminSet('approved/'+id,{name:r.name||'',at:new Date().toISOString(),role:($('#role-'+id)&&$('#role-'+id).value==='admin')?'admin':'learner',subjects:(function(){var v=$('#sub-'+id)?$('#sub-'+id).value:'both';return v==='ccna'?['ccna']:v==='excel'?['excel']:['ccna','excel'];})(),expiresAt:days?new Date(Date.now()+days*864e5).toISOString():null}).then(function(){return A.db.doc('requests/'+id).delete();}).then(function(){toast('Approved');}).catch(function(){toast('Could not approve. Try again.');});return;}
     if(act==='subj'){var rr=A.approved.filter(function(x){return x.id===id;})[0];if(!rr)return;var k=el.getAttribute('data-s'),L=subjList(rr).slice(),i=L.indexOf(k);if(i>=0){if(L.length===1){toast('Keep at least one subject.');return;}L.splice(i,1);}else L.push(k);A.db.doc('approved/'+id).update({subjects:L}).then(function(){toast('Subjects updated');}).catch(function(){toast('Could not change subjects.');});return;}
     if(act==='role'){A.db.doc('approved/'+id).update({role:el.getAttribute('data-role')==='admin'?'admin':'learner'}).then(function(){toast('Role changed');}).catch(function(){toast('Could not change role.');});return;}
@@ -1374,6 +1402,11 @@ document.addEventListener('click',function(e){
       if(f0){var fr=new FileReader();fr.onload=function(){try{A.rsBk=JSON.parse(fr.result);A.rsName=f0.name;run();}catch(x){A.rsBk=null;A.rs=null;A.rsErr='That file is not a valid backup (it could not be read as JSON).';render();}};fr.readAsText(f0);}else run();return;}
     if(act==='rs-go'){if(!A.rsConfirm){A.rsConfirm=true;render();return;}
       window.__api('admin_restore',{backup:A.rsBk,mode:A.rsMode||'missing'}).then(function(r){A.rsConfirm=false;if(r&&r.ok){A.rs=r;A.rsBk=null;toast('Backup restored.');}else A.rsErr=(r&&r.error)||'Restore failed.';A.usersAt=0;render();});return;}
+    if(act==='rm-ask'){A.rmFor=id;render();return;}
+    if(act==='rm-cancel'){A.rmFor=null;render();return;}
+    if(act==='rm-send'){var rs=$('#rm-reason');A.db.doc('removalreqs/'+id).set({reason:rs?rs.value:''}).then(function(){A.rmFor=null;toast('Request sent to the owner.');if(V.route==='admin')render();}).catch(function(){toast('Could not send the request.');});return;}
+    if(act==='rm-approve'){A.db.doc('approved/'+id).delete().then(function(){return A.db.doc('removalreqs/'+id).delete();}).then(function(){toast('Access removed');}).catch(function(){toast('Could not remove access.');});return;}
+    if(act==='rm-dismiss'){A.db.doc('removalreqs/'+id).delete().then(function(){toast('Request dismissed');}).catch(function(){toast('Could not dismiss.');});return;}
     if(act==='newcode'&&window.__api){window.__api('admin_newcode',{id:id}).then(function(r){if(r.code){A.secret={title:'New security code for '+r.name,text:r.code,note:(r.emailed?'It was also emailed to them. ':'It could not be emailed (learner emails are not set up yet), so give it to them yourself. ')+'It also unlocks the account if it was blocked. You can see it again any time with View security code.'};A.usersAt=0;render();}else toast(r.error||'Could not make a code.');});return;}
     if(act==='viewcode'&&window.__api){window.__api('admin_viewcode',{id:id}).then(function(r){if(r.code){A.secret={title:'Security code for '+r.name,text:r.code,note:'Only you can see this. Use it if they say they never received their code.'};render();}else if(r.none)toast(r.name+' has no security code. Use New security code.');else toast(r.error||'Could not read the code.');});return;}
     if(act==='copy-secret'&&A.secret){try{navigator.clipboard.writeText(A.secret.text).then(function(){toast('Copied');},function(){toast('Select the text and copy it.');});}catch(x){toast('Select the text and copy it.');}return;}
@@ -1459,7 +1492,9 @@ function initAccess(){
         function watchApproved(){db.collection('approved').onSnapshot(function(s){A.approved=s.docs.map(function(d){var x=d.data()||{};x.id=d.id;return x;});if(V.route==='admin'&&A.mode==='ok')render();},function(){});}
         function watchOwnerData(){
           db.collection('requests').onSnapshot(function(s){A.requests=s.docs.map(function(d){var x=d.data()||{};x.id=d.id;return x;});if(A.mode==='ok'){var rb=$('.topbar');if(rb)rb.outerHTML=topbarHtml(V.route==='home'||V.route==='account');if(V.route==='admin')render();}},function(){});
-          db.collection('alerts').onSnapshot(function(s){A.alerts=s.docs.map(function(d){var x=d.data()||{};x.id=d.id;return x;});if(V.route==='admin'&&A.mode==='ok')render();},function(){});
+          db.collection('removalreqs').onSnapshot(function(s){A.removals=s.docs.map(function(d){var x=d.data()||{};x.id=d.id;return x;});A.removalById={};A.removals.forEach(function(x){A.removalById[x.id]=1;});if(V.route==='admin'&&A.mode==='ok')render();},function(){});
+          db.collection('feedback').onSnapshot(function(s){A.feedback=s.docs.map(function(d){var x=d.data()||{};x.id=d.id;return x;});if(V.route==='admin'&&A.mode==='ok')render();},function(){});
+          if(A.isOwner)db.collection('alerts').onSnapshot(function(s){A.alerts=s.docs.map(function(d){var x=d.data()||{};x.id=d.id;return x;});if(V.route==='admin'&&A.mode==='ok')render();},function(){});
         }
         watchedAdmin=watchApproved;
         if(A.isAdmin){watchApproved();watchOwnerData();}
