@@ -759,6 +759,7 @@ html body .sheet.cv .cnum{background:#6b3f12;color:#f8eed4}
 .cgrid{gap:18px}
 .clog .lnum{width:2.2rem;text-align:right;font-weight:700;color:var(--muted,inherit);white-space:nowrap}
 .clog td:nth-child(2){white-space:nowrap}
+.privacy-note{font-size:.8rem;opacity:.8;margin:12px 0 0;line-height:1.45}
 
 
 body{margin:0}
@@ -826,7 +827,7 @@ body{margin:0}
   if(RT)return '<h2>Choose a new password</h2><form data-web-form="reset" novalidate>'+f('rs-password','New password (8+ characters)','password','autocomplete="new-password" required')+f('rs-confirm','Type it again','password','autocomplete="new-password" required')+'<button type="submit" class="cta">Save password <span aria-hidden="true">›</span></button></form><p id="web-err" class="auth-err" role="alert"></p>';
   if(ME&&ME.id&&ME.mustChange)return '<h2>Choose your own password</h2><p>You signed in with a one-time password. Pick a new password to continue.</p><form data-web-form="chg" novalidate>'+f('ch-password','New password (8+ characters)','password','autocomplete="new-password" required')+f('ch-confirm','Type it again','password','autocomplete="new-password" required')+'<button type="submit" class="cta">Save password <span aria-hidden="true">›</span></button></form><p id="web-err" class="auth-err" role="alert"></p>';
   return '<h2>Sign up or sign in</h2><div class="authtabs" role="group" aria-label="Sign up or sign in"><button type="button" class="pill-btn" data-web="tab" data-t="up" aria-pressed="true">Sign up</button><button type="button" class="pill-btn" data-web="tab" data-t="in" aria-pressed="false">Sign in</button></div>'
-   +'<form id="web-up" data-web-form="up" novalidate><div class="row2"><div>'+f('su-name','Your name','text','maxlength="60" autocomplete="name" required')+'</div><div>'+f('su-email','Email','text','inputmode="email" autocomplete="email" required')+'</div></div>'+f('su-password','Password (8+ characters)','password','autocomplete="new-password" required')+'<details class="owner-code"><summary>Site owner?</summary>'+f('su-setup','Owner setup code','password','autocomplete="off"')+'</details><button type="submit" class="cta">Sign up free <span aria-hidden="true">›</span></button></form>'
+   +'<form id="web-up" data-web-form="up" novalidate><div class="row2"><div>'+f('su-name','Your name','text','maxlength="60" autocomplete="name" required')+'</div><div>'+f('su-email','Email','text','inputmode="email" autocomplete="email" required')+'</div></div>'+f('su-password','Password (8+ characters)','password','autocomplete="new-password" required')+'<details class="owner-code"><summary>Site owner?</summary>'+f('su-setup','Owner setup code','password','autocomplete="off"')+'</details><button type="submit" class="cta">Sign up free <span aria-hidden="true">›</span></button></form><p class="privacy-note">We keep your name, email, a scrambled (hashed) password, an encrypted security code and your study progress, only to run this site. We never sell or share it, and you can delete your account any time from Account settings.</p>'
    +'<form id="web-in" data-web-form="in" hidden novalidate>'+f('si-email','Email','text','inputmode="email" autocomplete="email" required')+f('si-password','Password or one-time password','password','autocomplete="current-password" required')+'<button type="submit" class="cta">Sign in <span aria-hidden="true">›</span></button><p class="small"><a href="#" data-web="tab" data-t="fg">Forgot your password?</a></p></form>'
    +'<form id="web-fg" data-web-form="fg" hidden novalidate><p>Enter your email. We will email you a link. You will need the 5-digit security code you wrote down when you signed up.</p>'+f('fg-email','Email','text','inputmode="email" autocomplete="email" required')+'<button type="submit" class="cta">Email me a reset link <span aria-hidden="true">›</span></button><p class="small"><a href="#" data-web="tab" data-t="in">Back to sign in</a></p></form>'
    +'<p id="web-err" class="auth-err" role="alert"></p>';
@@ -855,6 +856,18 @@ body{margin:0}
   else if(kind==='vc'){p=api('verifycode',{token:RC,code:v('code')});}
   else{if(v('password')!==v('confirm')){fail('The two passwords do not match.');return;}p=kind==='reset'?api('reset',{token:RT||RC,password:v('password')}):api('changepw',{password:v('password')});}
   p.then(function(j){if(!j)return;if(j.__ok){if(kind==='up'&&j.securityCode){showCode(j.securityCode,done);return;}if(kind==='vc'){var w=document.getElementById('vc-wrap');if(w)w.outerHTML=resetFormHtml();er.textContent='';return;}done();}else if(j.code==='locked'){var w2=document.getElementById('vc-wrap')||f;if(w2)w2.hidden=true;lockedMsg(er);}else fail(j.error||'Something went wrong. Try again.');}).catch(function(){fail('Could not reach the site. Check your connection.');});});
+
+ function outageNotice(){
+  try{if(sessionStorage.getItem('ss-outage-seen'))return;}catch(e){}
+  fetch('/status.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
+   if(!j||!j.outage)return;
+   var m=document.createElement('div');m.className='lock-modal';m.id='outage-modal';
+   m.innerHTML='<div class="lm-card" role="alertdialog" aria-modal="true" aria-labelledby="ot-h"><span class="fn-badge">NOTICE</span><h2 id="ot-h">'+(j.title||'We are experiencing an outage')+'</h2><p class="lm-sub">'+(j.message||'We apologize. Signing in and saving are not working right now. Your data is safe. Please try again later.')+'</p><p class="lm-sub"><button type="button" class="cta" id="ot-ok">OK</button></p></div>';
+   document.body.appendChild(m);var b=m.querySelector('#ot-ok');b.focus();
+   b.addEventListener('click',function(){try{sessionStorage.setItem('ss-outage-seen','1');}catch(e){}m.remove();});
+  }).catch(function(){});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',outageNotice);else outageNotice();
 })();
 
 </script>
@@ -888,7 +901,7 @@ function freshS(){return {v:1,layout:'notebook',theme:'auto',rainbow:true,subjec
 function norm(){if(!S.read)S.read={};if(!S.lastBy)S.lastBy={};if(S.rainbow===undefined)S.rainbow=true;if(S.subject!=='excel')S.subject='ccna';}norm();
 var V={route:'home',tab:'lesson',quiz:null,rail:false,filter:''};
 var FREE_IDS={'network-basics':1,'x-workbook-basics':1},MMG_NUMBER='',ADMIN_CONTACT='';
-var A={free:false,out:false,mode:'checking',isOwner:false,canEdit:false,isAdmin:false,alerts:[],removals:[],removalById:{},feedback:[],fb:null,rmFor:null,alerted:false,name:'',email:'',id:null,db:null,requests:[],approved:[],reqDoc:null,appDoc:null,toast:''};
+var A={free:false,out:false,mode:'checking',isOwner:false,canEdit:false,isAdmin:false,alerts:[],removals:[],removalById:{},feedback:[],fb:null,rmFor:null,delOpen:false,delErr:'',alerted:false,name:'',email:'',id:null,db:null,requests:[],approved:[],reqDoc:null,appDoc:null,toast:''};
 var dbTimer=null,progressLoaded=false;
 try{A.out=LS.get('ccna-out')==='1';}catch(e){}
 function effDark(){return S.theme==='dark'||(S.theme!=='light'&&!!window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);}
@@ -1321,6 +1334,8 @@ function accountHtml(){
     if(A.myCode)h+='<p class="muted">Keep this code private. You need it to reset your password.</p><div class="code-big code-mine" aria-label="Your security code">'+String(A.myCode).split('').map(function(d){return '<i>'+esc(d)+'</i>';}).join('')+'</div><button class="btn" data-act="hidecode">Hide code</button>';
     else h+='<p class="muted">The 5-digit code you wrote down when you signed up. Enter your password to see it again.</p><label class="sr" for="mc-pw">Your password</label><input id="mc-pw" type="password" autocomplete="current-password" placeholder="Your password" style="max-width:280px;margin-right:8px"> <button class="btn" data-act="showcode">Show my security code</button>';}
   h+='<h2>Your totals</h2><ul><li>CCNA score: '+credits()+' / '+TOTAL_CREDITS+'</li><li>Questions to review: '+Object.keys(S.mistakes).length+'</li></ul>';
+  if(window.__api&&!A.isOwner){h+='<h2>Privacy and your data</h2><p class="muted">We keep only what the site needs: your name, your email, your password in scrambled (hashed) form, your security code in encrypted form, your study progress, and any reviews or requests you send. We use it only to run this site and never sell or share it. You can delete all of it at any time.</p>'
+    +(A.delOpen?'<div class="secretbox" role="alert"><b>Delete your account</b><p class="muted">This permanently deletes your account, your progress, your access record and your reviews. It cannot be undone.</p><label class="sr" for="da-pw">Your password</label><input id="da-pw" type="password" autocomplete="current-password" placeholder="Your password" style="max-width:280px;margin:0 8px 8px 0"> <label class="sr" for="da-ok">Type DELETE</label><input id="da-ok" type="text" autocomplete="off" placeholder="Type DELETE" style="max-width:200px;margin:0 8px 8px 0">'+(A.delErr?'<p class="err" role="status">'+esc(A.delErr)+'</p>':'')+'<p><button class="btn bad" data-act="del-go">Delete my account</button> <button class="btn" data-act="del-cancel">Cancel</button></p></div>':'<p><button class="btn bad" data-act="del-open">Delete my account</button></p>');}
   h+='<h2>Sign out</h2><p>Saves your progress to your account, clears the copy on this device and returns to the sign-in page. To sign out of your claude.ai account itself, use the account menu on claude.ai.</p><button class="btn" data-act="signout">Sign out</button>';
   h+='<p><a class="btn" href="#feedback" data-link="1" style="text-decoration:none">Leave a review or request</a>'+(A.isAdmin?' <a class="btn" href="#admin" data-link="1" style="text-decoration:none">Manage access</a>':'')+(A.isOwner?' <a class="btn" href="#constitution" data-link="1" style="text-decoration:none">Constitution</a>':'')+'</p>';
   return h+'</div>';
@@ -1396,6 +1411,9 @@ document.addEventListener('click',function(e){
   if(act==='showcode'&&window.__api){var pw0=$('#mc-pw');window.__api('mycode',{password:pw0?pw0.value:''}).then(function(r){if(r.code){A.myCode=r.code;render();}else if(r.none)toast('You do not have a security code yet. Contact the administrator.');else toast(r.error||'Could not show the code.');});return;}
   if(act==='request'){doRequest();return;}
   if(act==='fb-again'){A.fb=null;render();return;}
+  if(act==='del-open'){A.delOpen=true;A.delErr='';render();return;}
+  if(act==='del-cancel'){A.delOpen=false;A.delErr='';render();return;}
+  if(act==='del-go'&&window.__api){var dp=$('#da-pw'),dk=$('#da-ok');window.__api('delete_account',{password:dp?dp.value:'',confirm:dk?dk.value:''}).then(function(r){if(r&&r.ok){try{localStorage.clear();}catch(e){}A.delOpen=false;location.hash='';location.reload();}else{A.delErr=(r&&r.error)||'Could not delete the account. Try again.';render();}});return;}
   if(act==='fb-send'){var f=A.fb||(A.fb={kind:'review',rating:0}),ta2=$('#fb-text');f.text=ta2?ta2.value:(f.text||'');f.err='';
     if(f.text.trim().length<5){f.err='Please write a little more.';render();return;}
     window.__api('feedback',{kind:f.kind,text:f.text,rating:f.rating}).then(function(r){if(r&&r.ok){f.sent=true;f.text='';}else f.err=(r&&r.error)||'Could not send. Try again.';render();});return;}

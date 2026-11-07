@@ -13,6 +13,7 @@ module.exports=async(req,res)=>{
     else if(a==='forgot'&&req.method==='POST')out=await core.forgot(req);
     else if(a==='reset'&&req.method==='POST')out=await core.reset(req);
     else if(a==='mycode'&&req.method==='POST')out=await core.mycode(req);
+    else if(a==='delete_account'&&req.method==='POST')out=await core.deleteAccount(req);
     else if(a==='verifycode'&&req.method==='POST')out=await core.verifycode(req);
     else if(a==='admin_unlock'&&req.method==='POST')out=await core.adminUnlock(req);
     else if(a==='admin_newcode'&&req.method==='POST')out=await core.adminNewCode(req);
