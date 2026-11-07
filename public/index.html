@@ -757,6 +757,8 @@ html[data-theme=dark] .cs-Working{background:#1f3d22;color:#a8e0a8}
 html body .sheet.cv .cs-Working{background:#cfdcc2;color:#2f4a1f}
 html body .sheet.cv .cnum{background:#6b3f12;color:#f8eed4}
 .cgrid{gap:18px}
+.clog .lnum{width:2.2rem;text-align:right;font-weight:700;color:var(--muted,inherit);white-space:nowrap}
+.clog td:nth-child(2){white-space:nowrap}
 
 
 body{margin:0}
@@ -1199,7 +1201,7 @@ function cBody(sec,compact){var k=sec.title.toLowerCase(),it=sec.items,h='',i;
   it.forEach(function(x){if(x.k==='p')h+='<p class="cread">'+mdInline(x.t)+'</p>';});
   var ol=it.filter(function(x){return x.k==='ol';}),ul=it.filter(function(x){return x.k==='ul';});
   if(ol.length)h+=cList(ol,'ol');if(ul.length)h+=cList(ul,'ul');
-  if(trs.length){var head=trs[0].c,rows=trs.slice(1);h+='<div class="cscroll"><table class="clog"><thead><tr>'+head.map(function(c){return '<th>'+mdInline(c)+'</th>';}).join('')+'</tr></thead><tbody>'+rows.slice().reverse().map(function(r){return '<tr>'+r.c.map(function(c){return '<td>'+mdInline(c)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
+  if(trs.length){var head=trs[0].c,rows=trs.slice(1);h+='<div class="cscroll"><table class="clog"><thead><tr><th class="lnum">#</th>'+head.map(function(c){return '<th>'+mdInline(c)+'</th>';}).join('')+'</tr></thead><tbody>'+rows.slice().reverse().map(function(r,i){return '<tr><td class="lnum">'+(rows.length-i)+'</td>'+r.c.map(function(c){return '<td>'+mdInline(c)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
   return h;}
 function cStats(secs){var mo=0,pf=0,fl=0,rl=0;secs.forEach(function(s){var k=s.title.toLowerCase();if(k==='rules')rl=s.items.length;if(k==='major orders')mo=s.items.filter(function(x){return x.k!=='p';}).length;if(k==='pending and failed')s.items.forEach(function(x){if(x.k==='p')return;var c=cStat(x.t);if(c.s==='Pending')pf++;if(c.s==='Failed'&&!/^none/i.test(c.t))fl++;});});
   return '<div class="cstats"><div class="cstat"><b>'+rl+'</b><span>Rules</span></div><div class="cstat"><b>'+mo+'</b><span>Major Orders</span></div><div class="cstat t-Pending"><b>'+pf+'</b><span>Pending</span></div><div class="cstat t-Failed"><b>'+fl+'</b><span>Failed</span></div></div>';}
