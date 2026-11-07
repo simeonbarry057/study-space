@@ -27,6 +27,7 @@ Updated at every review. An item is removed only when confirmed working.
 - **NOT YET VERIFIED LIVE** Expiry cron run and the Drive backup.
 - **NOTE** Accounts created before security codes existed have no code; the owner uses a reset link, one-time password or new code.
 - **FAILED** Sign-in and saving (2026-11-06): the Vercel Blob store was suspended for exceeding the free Hobby usage limit, so sign-in returns server_error. Data is intact. Options: upgrade to Pro, wait for the monthly reset, or move storage. Simeon will decide later.
+- **PENDING** Mirrored storage (RAID-style): not built yet. Plan: every save is also written to a second, independent store so one provider cannot take the site down, with fewer saves and the daily off-site snapshot kept. Waiting on the decision on Pro, waiting or moving storage.
 ## Standing limits
 - Review emails go only to simeonbarry057@gmail.com, with the subject "CCNA Constitution Review". The only other people who may be emailed are the site's admins (from the adminEmails list), and only about sign-ups, requests, reviews and customer reminder copies; never codes, resets, locks, removal requests or the Constitution.
 - Claude may fix a small, clear bug in the published site and must list each fix in the email. Larger changes are proposed, not made.
