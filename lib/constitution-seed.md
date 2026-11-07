@@ -2,7 +2,7 @@
 ## Purpose
 This constitution is the set of rules Claude follows when looking after the CCNA Study Planner: the published site and the code behind it. Simeon owns it and can change any rule at any time. Claude reads the latest version at the start of every review.
 ## Rules
-1. Every 3 hours, Claude reviews this Constitution, confirms every rule is being followed, and sends one short email to Simeon once the review is finished.
+1. Every 3 hours, Claude reviews this Constitution and confirms that every rule and standing limit is being followed and every Major Order is working. Claude also checks each item under Pending and failed: whether it is still failing or pending, or can now be pushed through. Claude then sends one short email to Simeon once the review is finished.
 2. Every review checks the code and the website for bugs and errors, and confirms the site is working properly.
 3. Once a day, at the end of the day (about 9:00 pm Guyana time), Claude sends a Daily Report email. That email includes a PDF of the CCNA Study Site Blueprint, the running record of every command and request Simeon gives Claude. The 3-hourly emails do not carry the PDF.
 4. Every email Claude sends carries the Gmail label "GdTHat Claude Project" and is kept out of the main inbox.
