@@ -32,7 +32,7 @@ Updated at every review. An item is removed only when confirmed working.
 - **PENDING** Full review once the outage is fixed: re-test every Failed order and flip it back to Working when verified; test the Admin role, the Drive backup, a restore drill and Delete my account live; then turn off the outage pop-up (status.json).
 - **PENDING** Terms of use and refunds: Terms of Use (/terms) and Privacy Policy (/privacy) are drafted and live with a 16+ tick box on sign-up. A lawyer should read them and Simeon should confirm the refund rule (draft says 7 days).
 - **PENDING** Data Protection Act: register as a data controller if the Act is in force, confirm rules for 16 and 17 year olds (parent or guardian consent), accept Vercel, Google and Resend data processing terms, and set a 72-hour breach plan.
-- **PENDING** Tax and business registration: register the business name, get a GRA TIN, ask the GRA how education fees are treated for VAT (threshold about GY$15 million), and keep a payment log before charging.
+- **PENDING** Tax and business registration: Simeon already has a GRA TIN. Still to do: confirm the business name registration, ask the GRA how education fees are treated for VAT (threshold about GY$15 million), and keep a payment log before charging.
 - **PENDING** Move off Vercel Hobby before charging learners (Hobby forbids commercial use).
 - **PENDING** Legal and records: helper/admin confidentiality agreement drafted and needs signing by each admin; keep learner records, signed agreements and policies in the Study Space Legal Pack.
 - **PENDING** Self-host the site fonts so visitors' addresses are no longer sent to Google Fonts.

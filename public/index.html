@@ -1228,9 +1228,38 @@ function cTn(s){var k=s.title.toLowerCase(),n=0,c='';if(k==='purpose'||k==='amen
   else n=s.items.filter(function(x){return x.k==='ol'||x.k==='ul';}).length;
   return ' <span class="ctn'+c+'">'+n+'</span>';}
 function cSec(secs,key){return secs.filter(function(s){return s.title.toLowerCase()===key;})[0];}
+
+var LEGAL_REG=[
+ ['Terms of Use','Live at /terms','Lawyer to review; confirm the 7-day refund rule','Pending review'],
+ ['Privacy Policy','Live at /privacy','Lawyer to review; add real contact details','Pending review'],
+ ['Minimum age 16+ and agreement to Terms','Tick box on sign-up','None','Working'],
+ ['Cisco non-affiliation notice','Sign-up, Account and Terms','None','Working'],
+ ['Helper / admin confidentiality agreement','Drafted in the Study Space Legal Pack','Each admin signs before getting access','Pending signature'],
+ ['Data Protection Act registration','Not yet done','Check whether the Act is in force, the fee, and the rules for under-18s','Pending'],
+ ['GRA TIN','Held by Simeon','Keep a payment log once you charge','Done'],
+ ['Business name registration','Not yet confirmed','Confirm with the Registry or Small Business Bureau','Pending'],
+ ['VAT position for education fees','Not yet asked','Ask the GRA (threshold about GY$15 million)','Pending'],
+ ['Vercel plan','Hobby (non-commercial)','Upgrade to Pro before charging learners','Pending'],
+ ['Data processing terms: Vercel, Google, Resend','Not yet accepted','Accept each provider\'s standard terms in its dashboard','Pending'],
+ ['Fonts hosted on this site','Loaded from Google Fonts','Self-host so visitor addresses are not sent to Google','Pending'],
+ ['Breach plan (72 hours)','Not yet written','Write a one-page plan','Pending']];
+function recordsHtml(){
+  var ap=(A.approved||[]).slice(),h='<h2>Learners record</h2><p class="muted">A separate record of who has access, plus the legal documents, signatures and policies that need attention. It is not part of the Constitution and nothing here changes it.</p>';
+  h+='<h3>Learners ('+(ap.length)+')</h3><div class="tbl"><table><thead><tr><th>#</th><th>Person</th><th>Studying</th><th>Role</th><th>Started</th><th>Access ends</th><th>Status</th></tr></thead><tbody>';
+  if(!ap.length)h+='<tr><td colspan="7" class="muted">No approved learners yet.</td></tr>';
+  ap.forEach(function(r,i){var exp=r.expiresAt?new Date(r.expiresAt).getTime():0,gone=exp&&exp<Date.now();
+    h+='<tr><td>'+(i+1)+'</td><td><strong>'+esc(r.name||'Unnamed')+'</strong></td><td>'+esc(subjList(r).map(function(k){return k==='excel'?'Excel':'CCNA';}).join(' + '))+'</td><td>'+roleOf(r)+'</td><td>'+esc(r.at?new Date(r.at).toLocaleDateString():'?')+'</td><td>'+(exp?esc(new Date(exp).toLocaleDateString()):'No expiry')+'</td><td>'+(gone?'<span class="pill bad">expired</span>':'<span class="pill ok">active</span>')+'</td></tr>';});
+  h+='</tbody></table></div>';
+  h+='<h3>Legal documents and records</h3><div class="tbl"><table><thead><tr><th>#</th><th>Item</th><th>Where it is</th><th>Next step</th><th>Status</th></tr></thead><tbody>';
+  LEGAL_REG.forEach(function(r,i){var cls=/^(Working|Done)$/.test(r[3])?'ok':/signature|review/i.test(r[3])?'warn':'';h+='<tr><td>'+(i+1)+'</td><td><strong>'+esc(r[0])+'</strong></td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td><span class="pill '+cls+'">'+esc(r[3])+'</span></td></tr>';});
+  h+='</tbody></table></div><p class="muted">Signed agreements and the full drafts are kept in the Study Space Legal Pack document.</p>';
+  return h;}
 function constHtml(){
   if(A.cons===undefined){A.cons=null;window.__api('constitution',{}).then(function(r){A.cons=(r&&r.text)?r:{text:'Could not load the Constitution.'};if(V.route==='constitution')render();});}
   var h='<div class="sheet cv"><div class="page-head"><span class="kicker">Admin</span><h1>Constitution</h1><p>The standing rules and Major Orders Claude follows, with what is pending or failed. Read-only here; tell Claude in chat to change it.</p></div>';
+  var pg=A.cpage==='records'?'records':'cons';
+  h+='<div class="cswitch cpages" role="group" aria-label="Page">'+[['cons','Constitution'],['records','Learners record']].map(function(v){return '<button type="button" data-act="cpage" data-p="'+v[0]+'" aria-pressed="'+(pg===v[0])+'">'+v[1]+'</button>';}).join('')+'</div>';
+  if(pg==='records')return h+recordsHtml()+'</div>';
   if(!A.cons)return h+'<p class="muted">Loading…</p></div>';
   var secs=cParse(A.cons.text),view=A.cview||(function(){var v=LS.get('ccna-cview');return /^(glance|tabs|board|outline)$/.test(v||'')?v:'glance';})();A.cview=view;
   var tab=A.ctab&&cSec(secs,A.ctab.toLowerCase())?A.ctab:(secs[0]&&secs[0].title)||'';
@@ -1389,6 +1418,7 @@ document.addEventListener('click',function(e){
   if(act==='rail'){V.rail=!V.rail;render();return;}
   if(act==='cview'){A.cview=el.getAttribute('data-v');LS.set('ccna-cview',A.cview);render();window.scrollTo(0,0);return;}
   if(act==='ctab'){A.ctab=el.getAttribute('data-t');render();return;}
+  if(act==='cpage'){A.cpage=el.getAttribute('data-p');render();window.scrollTo(0,0);return;}
   if(act==='cfilt'){A.cfilt=el.getAttribute('data-f');render();return;}
   if(act==='cjump'){e.preventDefault();var cj=document.getElementById('csec-'+el.getAttribute('data-i'));if(cj)cj.scrollIntoView({behavior:'smooth'});return;}
   if(act==='layout'){S.layout=el.getAttribute('data-v');applyLook();save();render();return;}
