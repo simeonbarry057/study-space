@@ -749,6 +749,15 @@ html body .sheet.cv .ctn{background:#e6cf96;color:#3a2912}html body .sheet.cv .c
 .rate{display:flex;gap:4px;margin:4px 0 6px}.rate .star{font-size:1.8rem;line-height:1;background:none;border:0;cursor:pointer;color:#c9971c;padding:2px 4px}
 .stars{color:#c9971c;letter-spacing:1px}.fb-row p{white-space:pre-wrap}
 
+.ocard{position:relative;padding-top:20px}
+.cnum{position:absolute;top:-10px;left:-10px;min-width:28px;height:28px;padding:0 6px;box-sizing:border-box;border-radius:99px;background:var(--accent,#2b5fd9);color:var(--accent-fg,#fff);font:700 .85rem var(--font-ui,inherit);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px #0003}
+.obul{margin:6px 0 0;padding-left:1.15rem}.obul li{margin:0 0 6px}
+.cs-Working{background:#d5e8c9;color:#1f5a1f}
+html[data-theme=dark] .cs-Working{background:#1f3d22;color:#a8e0a8}
+html body .sheet.cv .cs-Working{background:#cfdcc2;color:#2f4a1f}
+html body .sheet.cv .cnum{background:#6b3f12;color:#f8eed4}
+.cgrid{gap:18px}
+
 
 body{margin:0}
 .authtabs{display:flex;gap:8px;margin:0 0 6px}
@@ -1175,14 +1184,16 @@ function cStat(t){var m=/^\*\*(PENDING|FAILED|NOT YET VERIFIED LIVE|NOTE)\b[^*]*
   return {s:'',t:t};}
 function cOrder(t){var m=/^\*\*(.+?)\*\*\s*(.*)$/.exec(t),ti=m?m[1]:'',body=m?m[2]:t,st='';
   if(/\(?\bPENDING\b\)?/i.test(ti)&&/\(.*PENDING.*\)/i.test(ti))st='Pending';else if(/\(.*IN PROGRESS.*\)/i.test(ti))st='Progress';
-  ti=ti.replace(/\s*\((PENDING|IN PROGRESS)\)/i,'').replace(/[.\s]+$/,'');return {ti:ti,body:body,s:st};}
-var CV_LAB={Pending:'Pending',Failed:'Failed',Unverified:'Unverified',Note:'Note',Progress:'In progress'};
+  ti=ti.replace(/\s*\((PENDING|IN PROGRESS|WORKING)\)/i,'').replace(/[.\s]+$/,'');return {ti:ti,body:body,s:st||'Working'};}
+var CV_LAB={Working:'Working',Pending:'Pending',Failed:'Failed',Unverified:'Unverified',Note:'Note',Progress:'In progress'};
 function cPill(s){return s?'<span class="cpill cs-'+s+'">'+CV_LAB[s]+'</span>':'';}
+function cSplit(b){return String(b||'').split(/(?<=[.!?])\s+(?=[A-Z(])/).map(function(x){return x.trim();}).filter(Boolean);}
+function cCard(o,n){return '<article class="ccard ocard"><span class="cnum" aria-label="Order '+n+'">'+n+'</span><div class="chead"><h3>'+mdInline(o.ti)+'</h3>'+cPill(o.s)+'</div><ul class="cread obul">'+cSplit(o.body).map(function(x){return '<li>'+mdInline(x)+'</li>';}).join('')+'</ul></article>';}
 function cList(items,tag){return '<'+tag+' class="cread">'+items.map(function(i){return '<li>'+mdInline(i.t)+'</li>';}).join('')+'</'+tag+'>';}
 function cBody(sec,compact){var k=sec.title.toLowerCase(),it=sec.items,h='',i;
   if(k==='major orders'&&compact){return '<div>'+it.filter(function(x){return x.k!=='p';}).map(function(x){var o=cOrder(x.t);return '<div class="cline">'+cPill(o.s)+'<span>'+mdInline(o.ti)+'</span></div>';}).join('')+'</div>';}
   if(k==='major orders'){var intro=it.filter(function(x){return x.k==='p';});intro.forEach(function(x){h+='<p class="muted">'+mdInline(x.t)+'</p>';});
-    h+='<div class="cgrid">'+it.filter(function(x){return x.k!=='p';}).map(function(x){var o=cOrder(x.t);return '<article class="ccard"><div class="chead"><h3>'+mdInline(o.ti)+'</h3>'+cPill(o.s)+'</div><p class="muted">'+mdInline(o.body)+'</p></article>';}).join('')+'</div>';return h;}
+    h+='<div class="cgrid">'+it.filter(function(x){return x.k!=='p';}).map(function(x,n){return cCard(cOrder(x.t),n+1);}).join('')+'</div>';return h;}
   if(k==='pending and failed'){it.forEach(function(x){if(x.k==='p'){h+='<p class="muted">'+mdInline(x.t)+'</p>';return;}var c=cStat(x.t);h+='<div class="cline">'+cPill(c.s)+'<span>'+mdInline(c.t)+'</span></div>';});return h;}
   var trs=it.filter(function(x){return x.k==='tr';});
   it.forEach(function(x){if(x.k==='p')h+='<p class="cread">'+mdInline(x.t)+'</p>';});
@@ -1209,8 +1220,8 @@ function constHtml(){
   else if(view==='tabs'){h+='<div class="ctabs" role="tablist">'+secs.map(function(s){return '<button type="button" role="tab" data-act="ctab" data-t="'+esc(s.title)+'" aria-selected="'+(s.title===tab)+'">'+esc(s.title)+cTn(s)+'</button>';}).join('')+'</div>';var cs=cSec(secs,tab.toLowerCase());if(cs)h+='<section class="ccard"><h2>'+mdInline(cs.title)+'</h2>'+cBody(cs)+'</section>';}
   else if(view==='board'){var f=A.cfilt||'All',mo=cSec(secs,'major orders');
     h+=cStats(secs);
-    if(mo){var its=mo.items.filter(function(x){return x.k!=='p';}),sts=its.map(function(x){return cOrder(x.t);}),opts=['All','Pending','Progress'];
-      h+='<h2>Major Orders</h2><div class="cfilters" role="group" aria-label="Filter by status">'+opts.map(function(o){var n=o==='All'?sts.length:sts.filter(function(x){return x.s===o;}).length;return '<button type="button" class="cchip" data-act="cfilt" data-f="'+o+'" aria-pressed="'+(f===o)+'">'+(o==='All'?'All':CV_LAB[o])+' ('+n+')</button>';}).join('')+'</div><div class="cgrid">'+sts.filter(function(o){return f==='All'||o.s===f;}).map(function(o){return '<article class="ccard"><div class="chead"><h3>'+mdInline(o.ti)+'</h3>'+cPill(o.s)+'</div><p class="muted">'+mdInline(o.body)+'</p></article>';}).join('')+'</div>';}
+    if(mo){var its=mo.items.filter(function(x){return x.k!=='p';}),sts=its.map(function(x){return cOrder(x.t);}),opts=['All','Working','Pending','Progress'];
+      h+='<h2>Major Orders</h2><div class="cfilters" role="group" aria-label="Filter by status">'+opts.map(function(o){var n=o==='All'?sts.length:sts.filter(function(x){return x.s===o;}).length;return '<button type="button" class="cchip" data-act="cfilt" data-f="'+o+'" aria-pressed="'+(f===o)+'">'+(o==='All'?'All':CV_LAB[o])+' ('+n+')</button>';}).join('')+'</div><div class="cgrid">'+sts.filter(function(o){return f==='All'||o.s===f;}).map(function(o,n){return cCard(o,n+1);}).join('')+'</div>';}
     ['rules','pending and failed','standing limits'].forEach(function(k){var s=cSec(secs,k);if(s)h+='<h2>'+mdInline(s.title)+'</h2><div class="ccard">'+cBody(s)+'</div>';});}
   else{h+='<div class="coutline"><nav class="ctoc" aria-label="Sections">'+secs.map(function(s,i){return '<a href="#constitution" data-act="cjump" data-i="'+i+'">'+esc(s.title)+'</a>';}).join('')+'</nav><div class="cdoc">'+secs.map(function(s,i){return '<section id="csec-'+i+'"><h2>'+mdInline(s.title)+'</h2>'+cBody(s)+'</section>';}).join('')+'</div></div>';}
   h+='<p class="muted">'+(A.cons.at?'Last updated '+esc(new Date(A.cons.at).toLocaleString()):'Showing the version built into the site.')+'</p><p><a class="btn" href="#admin" data-link="1" style="text-decoration:none">Back to Access</a></p></div>';
