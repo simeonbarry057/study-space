@@ -921,11 +921,12 @@ function toast(m){A.toast=m;var el=$('#toast');if(el)el.remove();var d=document.
 function qBest(tid,df){var r=(S.quiz[tid]||{})[df];return r?r.best:0;}
 function qTotal(tid,df){return D.quiz[tid][df].length;}
 function labReady(tid){return qBest(tid,'Easy')===qTotal(tid,'Easy')&&qBest(tid,'Hard')===qTotal(tid,'Hard');}
+function lessonReady(tid){return qPassed(tid,'Easy')&&qPassed(tid,'Hard');}
 function labDone(tid){return !!(S.labs[tid]&&S.labs[tid].done);}
 function topicStatus(tid){if(labDone(tid))return 'done';var any=DIFFS.some(function(df){return (S.quiz[tid]||{})[df];})||Object.keys((S.labs[tid]||{}).steps||{}).length>0;return any?'part':'none';}
 function credits(){var c=0;T.forEach(function(t){DIFFS.forEach(function(df){c+=qBest(t.id,df);});if(labDone(t.id))c++;});return c;}
 function qPassed(tid,df){var r=(S.quiz[tid]||{})[df];return !!r&&r.best>=Math.ceil(qTotal(tid,df)*0.8);}
-function stats(sub){var L=SUBJ[sub].list,n=L.length||1,les=L.filter(function(t){return S.read[t.id];}).length,labs=L.filter(function(t){return labDone(t.id);}).length,qz=0;L.forEach(function(t){DIFFS.forEach(function(df){if(qPassed(t.id,df))qz++;});});var qt=n*3;return {les:les,labs:labs,qz:qz,n:n,qt:qt,pl:Math.round(les/n*100),pb:Math.round(labs/n*100),pq:Math.round(qz/qt*100),pct:Math.round((les/n+labs/n+qz/qt)/3*100)};}
+function stats(sub){var L=SUBJ[sub].list,n=L.length||1,les=L.filter(function(t){return S.read[t.id]&&lessonReady(t.id);}).length,labs=L.filter(function(t){return labDone(t.id);}).length,qz=0;L.forEach(function(t){DIFFS.forEach(function(df){if(qPassed(t.id,df))qz++;});});var qt=n*3;return {les:les,labs:labs,qz:qz,n:n,qt:qt,pl:Math.round(les/n*100),pb:Math.round(labs/n*100),pq:Math.round(qz/qt*100),pct:Math.round((les/n+labs/n+qz/qt)/3*100)};}
 function curSubject(){var r=V.route||'home';if(r==='ccna'||r==='excel')return r;if(r.indexOf('t-')===0&&TB[r.slice(2)])return subjOfTopic(TB[r.slice(2)]);return S.subject||'ccna';}
 function doneCount(stage){return T.filter(function(t){return (!stage||t.stage===stage)&&labDone(t.id);}).length;}
 
@@ -1018,7 +1019,19 @@ function guideHtml(g){
   if(g.mastery&&g.mastery.length)h+='<h3>You have mastered this when you can</h3>'+list(g.mastery);
   return h;
 }
-function readBtn(t){var d=!!S.read[t.id];return '<div style="margin-top:18px">'+(d?'<span class="pill ok">Lesson complete</span> <button class="btn small" data-act="read" data-tid="'+esc(t.id)+'">Undo</button>':'<button class="btn good" data-act="read" data-tid="'+esc(t.id)+'">Mark lesson complete</button>')+'</div>';}
+function readBtn(t){var d=!!S.read[t.id]&&lessonReady(t.id);return '<div style="margin-top:18px">'+(d?'<span class="pill ok">Lesson complete</span> <button class="btn small" data-act="read" data-tid="'+esc(t.id)+'">Undo</button>':'<button class="btn good" data-act="read" data-tid="'+esc(t.id)+'">Mark lesson complete</button>')+'</div>';}
+function quizGateModal(tid){
+  var old=document.getElementById('gate-modal');if(old)old.remove();
+  var row=function(df){var ok=qPassed(tid,df),b=qBest(tid,df),n=qTotal(tid,df);return '<li>'+(ok?'&#10003; ':'&#9675; ')+'<strong>'+df+'</strong> quiz: '+(ok?'passed':'not passed yet')+(b?' (best '+b+' of '+n+')':'')+'</li>';};
+  var m=document.createElement('div');m.id='gate-modal';m.className='lock-modal';
+  m.innerHTML='<div class="lm-card" role="dialog" aria-modal="true" aria-labelledby="gm-h"><span class="fn-badge">NOT YET</span><h2 id="gm-h">Pass the quizzes first</h2><p class="lm-sub">You can mark this lesson complete once you have passed both the <b>Easy</b> and the <b>Hard</b> quiz for it (80% or more on each). Very Hard is optional bonus credit.</p><ul class="gate-list" style="text-align:left;margin:10px auto;max-width:320px;list-style:none;padding:0">'+row('Easy')+row('Hard')+'</ul><div class="lm-btns"><button type="button" class="cta" data-gm="quiz">Go to the quizzes <span aria-hidden="true">&#8250;</span></button><button type="button" class="btn" data-gm="close">Close</button></div></div>';
+  document.body.appendChild(m);
+  var close=function(){m.remove();document.removeEventListener('keydown',kd);};
+  var kd=function(e){if(e.key==='Escape')close();};
+  document.addEventListener('keydown',kd);
+  m.addEventListener('click',function(e){if(e.target===m){close();return;}var b=e.target.closest('[data-gm]');if(!b)return;close();if(b.getAttribute('data-gm')==='quiz'){V.tab='quiz';V.quiz=null;render();window.scrollTo({top:0});}});
+  var f=m.querySelector('[data-gm="quiz"]');if(f)f.focus();
+}
 function excelLessonHtml(t){
   var h='<div class="sheet"><div class="page-head"><span class="kicker">Excel · '+esc(t.subtitle)+'</span><h1>'+esc(t.title)+'</h1><p>'+esc(t.goal)+'</p></div>'+tabsHtml();
   h+='<h2>What to learn</h2>'+list(t.learn);
@@ -1425,7 +1438,7 @@ document.addEventListener('click',function(e){
   if(act==='signin-again'){A.out=false;try{localStorage.removeItem('ccna-out');}catch(x){}progressLoaded=false;if(A.mode==='ok'){loadProgress().then(function(){location.hash='home';route();});}else render();return;}
   if(act==='dark'){S.theme=effDark()?'light':'dark';applyLook();save();render();return;}
   if(act==='rainbow'){S.rainbow=!S.rainbow;applyLook();save();render();return;}
-  if(act==='read'){if(S.read[tid])delete S.read[tid];else S.read[tid]=1;save();render();return;}
+  if(act==='read'){if(S.read[tid])delete S.read[tid];else{if(!lessonReady(tid)){quizGateModal(tid);return;}S.read[tid]=1;}save();render();return;}
   if(act==='theme'){S.theme=el.getAttribute('data-v');applyLook();save();render();return;}
   if(act==='tab'){V.tab=el.getAttribute('data-tab');V.quiz=null;render();window.scrollTo({top:0});return;}
   if(act==='cp'){S.cp[tid]=+el.getAttribute('data-i');save();render();return;}
