@@ -12,7 +12,7 @@ Big, lasting commands for what the study site must do. Each review checks every 
 2. **Password reset by email.** Forgot password emails a link that asks for the 5-digit code, then a page to enter and re-enter a new password. A link works once for 1 hour.
 3. **Lockout.** After 5 wrong codes the account is locked and shows Blocked in the admin area, where Simeon can unlock it or issue a new code. Simeon is emailed when an account locks.
 4. **Expiry reminders.** Customers are emailed 10, 5 and 3 days before access ends and when it ends. Simeon is notified 3 days before and on the day, under the label GdTHat Exp Notices.
-5. **Sign-up alerts.** Simeon is emailed immediately on every sign-up, under the label GdTHat Study Space: new sign-ups.
+5. **Sign-up alerts (FAILED).** Currently failing: sign-ups are blocked by the storage outage. Simeon is emailed immediately on every sign-up, under the label GdTHat Study Space: new sign-ups.
 6. **Free first lesson and locked lessons.** New sign-ups get the first lesson free; the rest stay locked on the server until approved. Clicking a locked lesson shows a pop-up naming the free lesson.
 7. **Owner-only notebook editing.** Only the owner can edit the notebook pages. Admins and learners cannot.
 8. **Off-site backup.** All accounts, access records and progress are copied to Google Drive every day.

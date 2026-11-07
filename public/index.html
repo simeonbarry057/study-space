@@ -1185,8 +1185,8 @@ function cStat(t){var m=/^\*\*(PENDING|FAILED|NOT YET VERIFIED LIVE|NOTE)\b[^*]*
   var n=/^PENDING\s*-\s*(.*)$/.exec(t);if(n)return {s:'Pending',t:n[1]};n=/^FAILED\s*-\s*(.*)$/.exec(t);if(n)return {s:'Failed',t:n[1]};n=/^NOT YET VERIFIED LIVE\s*-\s*(.*)$/.exec(t);if(n)return {s:'Unverified',t:n[1]};n=/^NOTE\s*-\s*(.*)$/.exec(t);if(n)return {s:'Note',t:n[1]};
   return {s:'',t:t};}
 function cOrder(t){var m=/^\*\*(.+?)\*\*\s*(.*)$/.exec(t),ti=m?m[1]:'',body=m?m[2]:t,st='';
-  if(/\(?\bPENDING\b\)?/i.test(ti)&&/\(.*PENDING.*\)/i.test(ti))st='Pending';else if(/\(.*IN PROGRESS.*\)/i.test(ti))st='Progress';
-  ti=ti.replace(/\s*\((PENDING|IN PROGRESS|WORKING)\)/i,'').replace(/[.\s]+$/,'');return {ti:ti,body:body,s:st||'Working'};}
+  if(/\(?\bPENDING\b\)?/i.test(ti)&&/\(.*PENDING.*\)/i.test(ti))st='Pending';else if(/\(.*IN PROGRESS.*\)/i.test(ti))st='Progress';else if(/\(.*FAILED.*\)/i.test(ti))st='Failed';
+  ti=ti.replace(/\s*\((PENDING|IN PROGRESS|WORKING|FAILED)\)/i,'').replace(/[.\s]+$/,'');return {ti:ti,body:body,s:st||'Working'};}
 var CV_LAB={Working:'Working',Pending:'Pending',Failed:'Failed',Unverified:'Unverified',Note:'Note',Progress:'In progress'};
 function cPill(s){return s?'<span class="cpill cs-'+s+'">'+CV_LAB[s]+'</span>':'';}
 function cSplit(b){return String(b||'').split(/(?<=[.!?])\s+(?=[A-Z(])/).map(function(x){return x.trim();}).filter(Boolean);}
@@ -1222,7 +1222,7 @@ function constHtml(){
   else if(view==='tabs'){h+='<div class="ctabs" role="tablist">'+secs.map(function(s){return '<button type="button" role="tab" data-act="ctab" data-t="'+esc(s.title)+'" aria-selected="'+(s.title===tab)+'">'+esc(s.title)+cTn(s)+'</button>';}).join('')+'</div>';var cs=cSec(secs,tab.toLowerCase());if(cs)h+='<section class="ccard"><h2>'+mdInline(cs.title)+'</h2>'+cBody(cs)+'</section>';}
   else if(view==='board'){var f=A.cfilt||'All',mo=cSec(secs,'major orders');
     h+=cStats(secs);
-    if(mo){var its=mo.items.filter(function(x){return x.k!=='p';}),sts=its.map(function(x){return cOrder(x.t);}),opts=['All','Working','Pending','Progress'];
+    if(mo){var its=mo.items.filter(function(x){return x.k!=='p';}),sts=its.map(function(x){return cOrder(x.t);}),opts=['All','Working','Pending','Progress','Failed'];
       h+='<h2>Major Orders</h2><div class="cfilters" role="group" aria-label="Filter by status">'+opts.map(function(o){var n=o==='All'?sts.length:sts.filter(function(x){return x.s===o;}).length;return '<button type="button" class="cchip" data-act="cfilt" data-f="'+o+'" aria-pressed="'+(f===o)+'">'+(o==='All'?'All':CV_LAB[o])+' ('+n+')</button>';}).join('')+'</div><div class="cgrid">'+sts.filter(function(o){return f==='All'||o.s===f;}).map(function(o,n){return cCard(o,n+1);}).join('')+'</div>';}
     ['rules','pending and failed','standing limits'].forEach(function(k){var s=cSec(secs,k);if(s)h+='<h2>'+mdInline(s.title)+'</h2><div class="ccard">'+cBody(s)+'</div>';});}
   else{h+='<div class="coutline"><nav class="ctoc" aria-label="Sections">'+secs.map(function(s,i){return '<a href="#constitution" data-act="cjump" data-i="'+i+'">'+esc(s.title)+'</a>';}).join('')+'</nav><div class="cdoc">'+secs.map(function(s,i){return '<section id="csec-'+i+'"><h2>'+mdInline(s.title)+'</h2>'+cBody(s)+'</section>';}).join('')+'</div></div>';}
