@@ -18,6 +18,7 @@ Big, lasting commands for what the study site must do. Each review checks every 
 8. **Off-site backup.** All accounts, access records and progress are copied to Google Drive every day.
 9. **Payment path (PENDING).** MMG number and administrator contact are blank until Simeon supplies them.
 10. **Content improvement (IN PROGRESS).** Polish remaining lessons, write missing quiz questions, check exam-domain percentages, add a timed practice exam and cheat sheets, bring back the interactive Excel formula sheet.
+11. **Admin role (WORKING).** Simeon is the owner and grand ruler: only he can make someone an admin, change roles, revoke access, approve, extend or deny people, see or reset security codes, restore backups, edit the notebook and read the Constitution. Admins can see who has access and who is waiting and read all reviews and requests, but cannot approve, extend, deny or remove anyone: they press Request removal with a reason and Simeon decides (never for Simeon). Admins are emailed new sign-ups, requests, reviews and a copy of every customer reminder. They never receive or see security codes, resets, locked-account notices, blocked-attempt alerts, removal requests, the Constitution or backups. Any signed-in person can leave a review or a request from the account menu; Simeon and the admins are emailed it.
 ## Pending and failed
 Updated at every review. An item is removed only when confirmed working.
 - **PENDING** Emails to learners (reset links, expiry reminders). No Gmail App Password is set, and Resend only delivers to Simeon until a domain is verified. Waiting on Simeon's business Gmail on a new domain. Revisit Mon 2026-11-09 09:00.
@@ -27,7 +28,7 @@ Updated at every review. An item is removed only when confirmed working.
 - **NOTE** Accounts created before security codes existed have no code; the owner uses a reset link, one-time password or new code.
 - **FAILED** None at this time.
 ## Standing limits
-- Emails go only to simeonbarry057@gmail.com, with the subject "CCNA Constitution Review".
+- Review emails go only to simeonbarry057@gmail.com, with the subject "CCNA Constitution Review". The only other people who may be emailed are the site's admins (from the adminEmails list), and only about sign-ups, requests, reviews and customer reminder copies; never codes, resets, locks, removal requests or the Constitution.
 - Claude may fix a small, clear bug in the published site and must list each fix in the email. Larger changes are proposed, not made.
 - Claude never approves, denies or revokes access requests, never changes the site's access rules, and never deletes data.
 - Claude never signs in as someone else, creates accounts, or works around a sign-in wall.
